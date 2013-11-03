@@ -8,6 +8,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -70,6 +71,7 @@ public class MainPage {
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				objCommon = new CommonMethods();
+				//objCommon.createXML();
 				AddEvent windowAdd = new AddEvent(objCommon);
 				windowAdd.frame.setVisible(true);
 				windowMain.frame.setVisible(false);
@@ -82,17 +84,16 @@ public class MainPage {
 		//create a new button for Update Events and add it to the panel
 		JButton btnUpdate = new JButton("Update Event");
 		btnUpdate.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-					
-				UpdateEvent windowUpdate = new UpdateEvent(objCommon);
+			public void actionPerformed(ActionEvent ae) {					
+				UpdateEvent windowUpdate = new UpdateEvent();
 				windowUpdate.frame.setVisible(true);
-				windowMain.frame.setVisible(false);
-							
+				windowMain.frame.setVisible(false);							
 			}
 		});
 		btnUpdate.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		btnUpdate.setBounds(40, 156, 160, 30);
-		if(CommonMethods.hmEvents.isEmpty())
+		File xmlFile = new File("file.xml");
+		if(!xmlFile.exists())
 			btnUpdate.setEnabled(false);		
 		else
 			btnUpdate.setEnabled(true);

@@ -70,9 +70,8 @@ public class AddEvent {
 		JButton btnNext = new JButton("SAVE");
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ArrayList<HashMap<String,String>> tempList = objCommon.Add();
-				if(tempList!=null){
-					CommonMethods.hmEvents.put(((HashMap<String, String>)tempList.get(1)).get("EVNAME"), tempList); //hard-coded(test)
+				if(objCommon.Add()){
+					//CommonMethods.hmEvents.put(((HashMap<String, String>)tempList.get(1)).get("EVNAME"), tempList); //hard-coded(test)
 					frame.setVisible(false);
 				    MainPage objMain = new MainPage();
 				    objMain.frame.setVisible(true);

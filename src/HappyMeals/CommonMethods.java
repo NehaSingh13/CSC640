@@ -4,12 +4,13 @@
 
 package HappyMeals;
 
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +33,20 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class CommonMethods {
 	
@@ -106,6 +121,10 @@ public class CommonMethods {
 	
 	ArrayList<HashMap<String,String>> arrEventDetails; //will be separate for every event and will store the details of that particular event
 	static HashMap<String,ArrayList<HashMap<String,String>>> hmEvents = new HashMap<String,ArrayList<HashMap<String,String>>>(); //HashMap object for storing Events data [Key:Event Name, Value: ArrayList Object]
+	
+	
+	static ArrayList<String> arrEvents;//XML
+	
 	
 	//Arrays used for storing menu information
 	//headers for columns
@@ -1466,18 +1485,14 @@ public class CommonMethods {
 		}
 		
 		
-	public ArrayList<HashMap<String, String>> Add(){
+	public boolean Add(){
 		
 		boolean val = validation();
 		
 		if(val){
-			arrEventDetails = new ArrayList<HashMap<String,String>>(); //create a new object of the ArrayList
-			return Save(arrEventDetails);
+			Save();
 		}
-		else {
-			return null; //do nothing
-		}
-				
+		return val;
 	}
 	
 	private boolean validateOrders(String tab){
@@ -1620,49 +1635,19 @@ public class CommonMethods {
 		}
 	}
 	
-	public ArrayList<HashMap<String, String>> Update(ArrayList<HashMap<String, String>> arrTemp){
+	public void Update(String selEvent){
 		
 		boolean val = validation();
 		
 		if(val){
-			return Save(arrTemp);
+			updateXML(selEvent);
 		}
-		else {
-			return null; //do nothing
-		}
-			
+		//return val;
 		
 	}
 	
-	private ArrayList<HashMap<String, String>> Save(ArrayList<HashMap<String, String>> arrTemp){
+	private void Save(){
 		
-		arrTemp.clear();
-		
-		hmClientTab.put("FN", txtFN.getText());
-		hmClientTab.put("LN", txtLN.getText());
-		hmClientTab.put("STREET", txtStreet.getText());
-		hmClientTab.put("CITY", txtCity.getText());
-		hmClientTab.put("STATE", cmbStates.getSelectedItem().toString());
-		hmClientTab.put("ZIP", txtZip.getText());
-		hmClientTab.put("PHONE", txtPhone.getText());
-		hmClientTab.put("EMAIL", txtEmail.getText());
-						
-		
-		arrTemp.add(hmClientTab); //add the hashmap clients to the arraylist
-		
-		
-		
-		
-		//Add Event Tab details to the Hashmap
-		hmEventTab.put("EVNAME", txtEventName.getText());		
-		hmEventTab.put("DATE", txtDate.getText());
-		hmEventTab.put("TIME", txtTime.getText());			
-		hmEventTab.put("VENUE", (rdbtnOurBanquet.isSelected() ? "OUR BANQUET" : txtOther.getText()));
-		hmEventTab.put("ATTEND", txtAttend.getText());
-		hmEventTab.put("NOTES", txtNotes.getText());
-		hmEventTab.put("AMNTPAID", txtAmountPaid.getText());
-		
-		arrTemp.add(hmEventTab); //add the hashmap Events to the arraylist
 		
 		//Add Drink Tab details to the Hashmap
 		hmDrinkTab.put("DRINK0", txtDrink0.getText());
@@ -1713,7 +1698,311 @@ public class CommonMethods {
 		hmDessertTab.put("DESSERT9", txtDessert9.getText());
 		hmDessertTab.put("DE_SUBTOTAL", "0");
 		
-		return arrTemp;
+		File dataFile = new File("file.xml");
+		if(!dataFile.exists())	createXML();	
+		else appendXML();	
+	}
+	
+	private void appendXML() {
+		try {
+			String filepath = "file.xml";
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(filepath);
+			
+			Node eventsRoot = doc.getFirstChild(); //get the root element
+			
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(addNewEvent(doc, (Element) eventsRoot));
+			StreamResult result = new StreamResult(new File(filepath));	 
+			
+			// Output to console for testing
+			//StreamResult result = new StreamResult(System.out);
+	 			
+			transformer.transform(source, result);
+	 
+			System.out.println("File updated!");
+		}
+		catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		   } catch (IOException ioe) {
+			ioe.printStackTrace();
+		   } catch (SAXException sae) {
+			sae.printStackTrace();
+		   }  catch (TransformerException tfe) {
+			tfe.printStackTrace();
+		   }
+	}
+	
+	
+	private Document addNewEvent(Document doc, Element rootElement){
+		//event elements
+		Element event = doc.createElement("EVENT");
+		rootElement.appendChild(event);
+ 
+		// set attribute to event element
+		event.setAttribute("NAME",txtEventName.getText().trim());
+ 
+		//DATE element
+		Element evDate = doc.createElement("DATE");
+		evDate.appendChild(doc.createTextNode(txtDate.getText().trim()));
+		event.appendChild(evDate);
+ 
+		// TIME element
+		Element evTime = doc.createElement("TIME");
+		evTime.appendChild(doc.createTextNode(txtTime.getText().trim()));
+		event.appendChild(evTime);
+ 
+		//VENUE element
+		Element evVenue = doc.createElement("VENUE");
+		String ven = rdbtnOurBanquet.isSelected() ? "OUR BANQUET" : txtOther.getText().trim();
+		evVenue.appendChild(doc.createTextNode(ven));
+		event.appendChild(evVenue);
+ 
+		//ATTEND element
+		Element evAttend = doc.createElement("ATTEND");
+		evAttend.appendChild(doc.createTextNode(txtAttend.getText().trim()));
+		event.appendChild(evAttend);
 		
+		//NOTES element
+		Element evNotes = doc.createElement("NOTES");
+		evNotes.appendChild(doc.createTextNode(txtNotes.getText().trim()));
+		event.appendChild(evNotes);
+		
+		
+		//AMOUNT PAID element
+		Element evPaid = doc.createElement("PAID");
+		evPaid.appendChild(doc.createTextNode(txtAmountPaid.getText().trim()));
+		event.appendChild(evPaid);
+		
+		
+		//CLIENT FN element
+		Element clFN = doc.createElement("CL_FN");
+		clFN.appendChild(doc.createTextNode(txtFN.getText().trim()));
+		event.appendChild(clFN);
+		
+		//CLIENT LN element
+		Element clLN = doc.createElement("CL_LN");
+		clLN.appendChild(doc.createTextNode(txtLN.getText().trim()));
+		event.appendChild(clLN);
+		
+		//CLIENT STREET element
+		Element clStreet = doc.createElement("CL_STREET");
+		clStreet.appendChild(doc.createTextNode(txtStreet.getText().trim()));
+		event.appendChild(clStreet);
+		
+		//CLIENT CITY element
+		Element clCity = doc.createElement("CL_CITY");
+		clCity.appendChild(doc.createTextNode(txtCity.getText().trim()));
+		event.appendChild(clCity);
+		
+		//CLIENT STATE element
+		Element clState = doc.createElement("CL_STATE");
+		clState.appendChild(doc.createTextNode(cmbStates.getSelectedItem().toString()));
+		event.appendChild(clState);
+		
+		//CLIENT ZIP element
+		Element clZip = doc.createElement("CL_ZIP");
+		clZip.appendChild(doc.createTextNode(txtZip.getText().trim()));
+		event.appendChild(clZip);
+		
+		//CLIENT PHONE element
+		Element clPhone = doc.createElement("CL_PHONE");
+		clPhone.appendChild(doc.createTextNode(txtPhone.getText().trim()));
+		event.appendChild(clPhone);
+		
+		//CLIENT EMAIL element
+		Element clEmail = doc.createElement("CL_EMAIL");
+		clEmail.appendChild(doc.createTextNode(txtEmail.getText().trim()));
+		event.appendChild(clEmail);
+		
+		return doc;
+	}
+	
+	
+	private void createXML(){
+		try {
+			 
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+	 
+			// root elements
+			Document doc = docBuilder.newDocument();
+			Element rootElement = doc.createElement("EVENTS");
+			doc.appendChild(rootElement);		
+			
+			
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(addNewEvent(doc, rootElement));
+			StreamResult result = new StreamResult(new File("file.xml"));
+	 
+			
+			// Output to console for testing
+			//StreamResult result = new StreamResult(System.out);
+	 			
+			transformer.transform(source, result);
+	 
+			System.out.println("File saved!");
+	 
+		  } catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		  } catch (TransformerException tfe) {
+			tfe.printStackTrace();
+		  }
+		}
+	
+	public void getEvents(){		
+		try{
+			File xmlFile = new File("file.xml");
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(xmlFile);
+		  
+			NodeList nList = doc.getElementsByTagName("EVENT");
+			arrEvents = new ArrayList<String>();
+			
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+				Node nNode = nList.item(temp);			  
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+		 			Element e = (Element) nNode;
+					arrEvents.add(e.getAttribute("NAME"));		 			
+				}
+			}
+			
+		}
+		catch(Exception ex){
+			ex.printStackTrace();
+		}
+	
+	}
+	
+	private void updateXML(String selEvent){
+		try {
+			String filepath = "file.xml";
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(filepath);
+	 
+	 
+			NodeList nList = doc.getElementsByTagName("EVENT");
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+				 
+				Node nNode = nList.item(temp);
+		 
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+		 
+					Element eElement = (Element) nNode;
+					if(eElement.getAttribute("NAME").equals(selEvent)){
+						eElement.setAttribute("NAME", txtEventName.getText().trim());
+						
+						NodeList list = eElement.getChildNodes(); //get the list of all nodes under this event
+						
+						for (int i = 0; i<list.getLength();i++){
+							Node node = list.item(i);
+							
+						   // get the DATE element, and update the value
+						   if (node.getNodeName().equals("DATE")) {
+							   node.setTextContent(txtDate.getText().trim());
+						   }
+						   
+						// get the TIME element, and update the value
+						   if (node.getNodeName().equals("TIME")) {
+							   node.setTextContent(txtTime.getText().trim());
+						   }
+						   
+						// get the VENUE element, and update the value
+						   if (node.getNodeName().equals("VENUE")) {
+							   String ven = rdbtnOurBanquet.isSelected() ? "OUR BANQUET" : txtOther.getText().trim();
+							   node.setTextContent(ven);
+						   }
+						   
+							// get the ATTEND element, and update the value
+						   if (node.getNodeName().equals("ATTEND")) {
+							   node.setTextContent(txtAttend.getText().trim());
+						   }
+						   
+							// get the NOTES element, and update the value
+						   if (node.getNodeName().equals("NOTES")) {
+							   node.setTextContent(txtNotes.getText().trim());
+						   }
+						   
+							// get the AMOUNT PAID element, and update the value
+						   if (node.getNodeName().equals("PAID")) {
+							   node.setTextContent(txtAmountPaid.getText().trim());
+						   }
+						   
+						   
+						   
+						   //updating the CLIENT Tab elements
+						   
+							// get the FN element, and update the value
+						   if (node.getNodeName().equals("CL_FN")) {
+							   node.setTextContent(txtFN.getText().trim());
+						   }
+						   
+							// get the LN element, and update the value
+						   if (node.getNodeName().equals("CL_LN")) {
+							   node.setTextContent(txtLN.getText().trim());
+						   }
+						   
+							// get the STREET element, and update the value
+						   if (node.getNodeName().equals("CL_STREET")) {
+							   node.setTextContent(txtStreet.getText().trim());
+						   }
+						   
+							// get the CITY element, and update the value
+						   if (node.getNodeName().equals("CL_CITY")) {
+							   node.setTextContent(txtCity.getText().trim());
+						   }
+						   
+							// get the STATE element, and update the value
+						   if (node.getNodeName().equals("STATE")) {
+							   //TODO State not being changed when updating
+							   node.setTextContent(cmbStates.getSelectedItem().toString());
+						   }
+						   
+							// get the ZIP element, and update the value
+						   if (node.getNodeName().equals("CL_ZIP")) {
+							   node.setTextContent(txtZip.getText().trim());
+						   }
+						   
+							// get the PHONE element, and update the value
+						   if (node.getNodeName().equals("CL_PHONE")) {
+							   node.setTextContent(txtPhone.getText().trim());
+						   }
+						   
+							// get the EMAIL element, and update the value
+						   if (node.getNodeName().equals("CL_EMAIL")) {
+							   node.setTextContent(txtEmail.getText().trim());
+						   }
+				 
+						}
+							
+					}
+				}
+			}
+			
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File(filepath));
+			transformer.transform(source, result);
+	 
+			System.out.println("Done");
+	 
+		   } catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		   } catch (TransformerException tfe) {
+			tfe.printStackTrace();
+		   } catch (IOException ioe) {
+			ioe.printStackTrace();
+		   } catch (SAXException sae) {
+			sae.printStackTrace();
+		   }
 	}
 }

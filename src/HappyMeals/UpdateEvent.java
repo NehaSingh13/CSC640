@@ -9,11 +9,10 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -29,6 +28,13 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class UpdateEvent {
 
@@ -37,17 +43,19 @@ public class UpdateEvent {
 	public JFrame frame; //JFrame object
 	private CommonMethods objCommon;
 	
-	JComboBox<String> cmbSelEvent;
+	JComboBox<Object> cmbSelEvent;
 	JTabbedPane tabPan;
 	HashMap<String,String> ClientDet,EventDet,DrinkDet,SnackDet,
 	EntreeDet, DessertDet;
 	ArrayList<HashMap<String,String>> arrTemp;
 	
+	
 	/**
 	 * Create the application.
 	 */
-	public UpdateEvent(CommonMethods obj) {
-		objCommon = obj;
+	public UpdateEvent() {
+		objCommon = new CommonMethods();
+		objCommon.getEvents();
 		initialize();
 	}
 
@@ -95,55 +103,66 @@ public class UpdateEvent {
 		pnlUpdate.add(lblSelEvent);
 		
 		//Combo-box for selecting event
-		cmbSelEvent = new JComboBox<String>();
-		cmbSelEvent.setBounds(204, 34, 174, 20);
-		
-		
-		 
-		Set set = CommonMethods.hmEvents.entrySet(); //get the set of values in the HashMap
-		
-		Iterator i = set.iterator(); //create an iterator for the set
-		
-		// Add elements to the combo box
-		cmbSelEvent.addItem("Select...");
-		while(i.hasNext()) { 
-			Map.Entry me = (Map.Entry)i.next(); 
-			cmbSelEvent.addItem((String)me.getKey());
-		}
-		
+		Collections.sort(CommonMethods.arrEvents);
+		cmbSelEvent = new JComboBox<Object>(CommonMethods.arrEvents.toArray());
+		cmbSelEvent.insertItemAt("Select...", 0);
+		cmbSelEvent.setSelectedIndex(0);
+		cmbSelEvent.setBounds(204, 34, 174, 20);		
 		
 		//Display the tabs only when some event is selected from the list
 		cmbSelEvent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(!cmbSelEvent.getSelectedItem().equals("Select...")){
 					tabPan.setVisible(true);
-					arrTemp = CommonMethods.hmEvents.get(cmbSelEvent.getSelectedItem());
-					ClientDet = new HashMap<String, String>();
-					ClientDet = arrTemp.get(0);
-					
+									
 					if(tabPan.getTitleAt(tabPan.getSelectedIndex()).equals("Client")){
-						
-						Component[] tabComp = ((JPanel)(tabPan.getComponents()[0])).getComponents();
-						for(int i=0; i< tabComp.length;i++)
-						{
-							if(tabComp[i].getName() != null){
-								switch(tabComp[i].getName()){
-									case "FN": ((JTextField) tabComp[i]).setText(ClientDet.get("FN")); break;
-									case "LN": ((JTextField) tabComp[i]).setText(ClientDet.get("LN")); break;
-									case "STREET": ((JTextField) tabComp[i]).setText(ClientDet.get("STREET")); break;
-									case "CITY": ((JTextField) tabComp[i]).setText(ClientDet.get("CITY")); break;
-									case "STATE": ((JComboBox) tabComp[i]).setSelectedItem((ClientDet.get("STATE"))); break;
-									case "ZIP": ((JTextField) tabComp[i]).setText(ClientDet.get("ZIP")); break;
-									case "PHONE": ((JTextField) tabComp[i]).setText(ClientDet.get("PHONE")); break;
-									case "EMAIL": ((JTextField) tabComp[i]).setText(ClientDet.get("EMAIL")); break;
-									default: System.out.println("Error in setting Client Name");
+						try {
+							 
+							File xmlFile = new File("file.xml");
+							DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+							DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+							Document doc = dBuilder.parse(xmlFile);
+						 
+							//To normalize the multi-line text in XML Nodes
+							doc.getDocumentElement().normalize();
+						 
+							
+							NodeList nList = doc.getElementsByTagName("EVENT");
+						 
+												 
+							for (int temp = 0; temp < nList.getLength(); temp++) {
+						 
+								Node nNode = nList.item(temp);		 
+											 
+								if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+						 
+									Element eElement = (Element) nNode;
+									if(eElement.getAttribute("NAME").equals(cmbSelEvent.getSelectedItem())){
+										Component[] tabComp = ((JPanel)(tabPan.getComponents()[0])).getComponents();
+										for(int i=0; i< tabComp.length;i++)
+										{
+											if(tabComp[i].getName() != null){
+												switch(tabComp[i].getName()){
+													case "FN": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_FN").item(0).getTextContent()); break;
+													case "LN": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_LN").item(0).getTextContent()); break;
+													case "STREET": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_STREET").item(0).getTextContent()); break;
+													case "CITY": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_CITY").item(0).getTextContent()); break;
+													case "STATE": ((JComboBox) tabComp[i]).setSelectedItem(eElement.getElementsByTagName("CL_STATE").item(0).getTextContent()); break;
+													case "ZIP": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_ZIP").item(0).getTextContent()); break;
+													case "PHONE": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_PHONE").item(0).getTextContent()); break;
+													case "EMAIL": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_EMAIL").item(0).getTextContent()); break;
+													default: System.out.println("Error in setting Client Name");
+												}
+											}
+										}
+									}
 								}
 							}
-							
 						}
-					}
-					
-				
+						catch (Exception ex) {
+							ex.printStackTrace();
+						}						
+					}					
 				}
 				else{
 					tabPan.setVisible(false);
@@ -168,9 +187,9 @@ public class UpdateEvent {
 		btnUpdate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				ArrayList<HashMap<String,String>> tempList = objCommon.Update(objCommon.arrEventDetails);
+				 objCommon.Update(cmbSelEvent.getSelectedItem().toString());
 				
-				CommonMethods.hmEvents.put(((HashMap<String, String>)tempList.get(1)).get("EVNAME"), tempList);
+				//CommonMethods.hmEvents.put(((HashMap<String, String>)tempList.get(1)).get("EVNAME"), tempList);
 				
 			}
 		});
@@ -198,17 +217,17 @@ public class UpdateEvent {
 	}
 	
 	private void selTab(JTabbedPane selectedTab){
-		arrTemp = CommonMethods.hmEvents.get(cmbSelEvent.getSelectedItem());
+		//arrTemp = CommonMethods.hmEvents.get(cmbSelEvent.getSelectedItem());
 		//System.out.println(arrTemp.get(0));
 		//System.out.println(arrTemp.get(1));
-		ClientDet = new HashMap<String, String>();
-		EventDet = new HashMap<String, String>();
-		DrinkDet = new HashMap<String, String>();
-		SnackDet = new HashMap<String, String>();
-		EntreeDet = new HashMap<String, String>();
-		DessertDet = new HashMap<String, String>();
+		//ClientDet = new HashMap<String, String>();
+		//EventDet = new HashMap<String, String>();
+		//DrinkDet = new HashMap<String, String>();
+		//SnackDet = new HashMap<String, String>();
+		//EntreeDet = new HashMap<String, String>();
+		//DessertDet = new HashMap<String, String>();
 		
-		if(arrTemp.size() == 1){ ClientDet = arrTemp.get(0);}
+		/*if(arrTemp.size() == 1){ ClientDet = arrTemp.get(0);}
 		else if(arrTemp.size() == 2){ 
 			ClientDet = arrTemp.get(0);
 			EventDet = arrTemp.get(1);
@@ -238,66 +257,90 @@ public class UpdateEvent {
 			SnackDet = arrTemp.get(3);
 			EntreeDet = arrTemp.get(4);
 			DessertDet = arrTemp.get(5);
+		}*/
+		try {
+			 
+			File xmlFile = new File("file.xml");
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(xmlFile);
+		 
+			//To normalize the multi-line text in XML Nodes
+			doc.getDocumentElement().normalize();
+		 
+			
+			NodeList nList = doc.getElementsByTagName("EVENT");
+		 
+								 
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+		 
+				Node nNode = nList.item(temp);		 
+							 
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+		 
+					Element eElement = (Element) nNode;
+					if(eElement.getAttribute("NAME").equals(cmbSelEvent.getSelectedItem())){
+		
+						if(selectedTab.getTitleAt(selectedTab.getSelectedIndex()).equals("Client")){
+			
+							Component[] tabComp = ((JPanel)(tabPan.getComponents()[0])).getComponents();
+							for(int i=0; i< tabComp.length;i++)
+							{
+								if(tabComp[i].getName() != null){
+									switch(tabComp[i].getName()){
+										case "FN": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_FN").item(0).getTextContent()); break;
+										case "LN": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_LN").item(0).getTextContent()); break;
+										case "STREET": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_STREET").item(0).getTextContent()); break;
+										case "CITY": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_CITY").item(0).getTextContent()); break;
+										case "STATE": ((JComboBox<?>) tabComp[i]).setSelectedItem(eElement.getElementsByTagName("CL_STATE").item(0).getTextContent()); break;
+										case "ZIP": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_ZIP").item(0).getTextContent()); break;
+										case "PHONE": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_PHONE").item(0).getTextContent()); break;
+										case "EMAIL": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("CL_EMAIL").item(0).getTextContent()); break;
+										default: System.out.println("Error in setting Client Name");
+									}
+								}
+							}
+								
+						}
+				
+						else if(selectedTab.getTitleAt(selectedTab.getSelectedIndex()).equals("Event")){
+							Component[] tabComp = ((JPanel)(tabPan.getComponents()[1])).getComponents();
+							for(int i=0; i< tabComp.length;i++)
+							{
+								if(tabComp[i].getName() != null){
+									switch(tabComp[i].getName()){
+										case "EVNAME":((JTextField) tabComp[i]).setText((String)cmbSelEvent.getSelectedItem());break;
+										case "DATE": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("DATE").item(0).getTextContent()); break;
+										case "TIME": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("TIME").item(0).getTextContent()); break;
+										case "OB": 	if(eElement.getElementsByTagName("VENUE").item(0).getTextContent().equals("OUR BANQUET")){
+														((JRadioButton)tabComp[i]).setSelected(true);
+													}break;
+										case "O":	if(!eElement.getElementsByTagName("VENUE").item(0).getTextContent().equals("OUR BANQUET")){
+													((JRadioButton)tabComp[i]).setSelected(true);
+												}break;
+										case "OTHER":if(!eElement.getElementsByTagName("VENUE").item(0).getTextContent().equals("OUR BANQUET")){
+													((JTextField)tabComp[i]).setEnabled(true);
+													((JTextField)tabComp[i]).setText(eElement.getElementsByTagName("VENUE").item(0).getTextContent());
+												}break;
+										case "ATTEND": ((JTextField) tabComp[i]).setText(eElement.getElementsByTagName("ATTEND").item(0).getTextContent()); break;
+										case "NOTE_SCROLL": ((JTextArea) (((JScrollPane) tabComp[i]).getViewport()).getView()).setText(eElement.getElementsByTagName("NOTES").item(0).getTextContent()); break;
+										default: System.out.println("Error in getting Event Details");
+									}
+								}
+							}
+						}//end else if for event
+						
+					}//end if for matched event name
+				}//end if for Element Node
+				
+			}//end if for for loop on EVENT list
+			
+		}//end try block
+		catch(Exception ex){
+			ex.printStackTrace();
 		}
 		
-		
-		if(selectedTab.getTitleAt(selectedTab.getSelectedIndex()).equals("Client")){
-			
-			Component[] tabComp = ((JPanel)(tabPan.getComponents()[0])).getComponents();
-			for(int i=0; i< tabComp.length;i++)
-			{
-				
-				if(tabComp[i].getName() != null){
-					
-					switch(tabComp[i].getName()){
-						case "FN": ((JTextField) tabComp[i]).setText(ClientDet.get("FN")); break;
-						case "LN": ((JTextField) tabComp[i]).setText(ClientDet.get("LN")); break;
-						case "STREET": ((JTextField) tabComp[i]).setText(ClientDet.get("STREET")); break;
-						case "CITY": ((JTextField) tabComp[i]).setText(ClientDet.get("CITY")); break;
-						case "STATE": ((JComboBox<?>) tabComp[i]).setSelectedItem((ClientDet.get("STATE"))); break;
-						case "ZIP": ((JTextField) tabComp[i]).setText(ClientDet.get("ZIP")); break;
-						case "PHONE": ((JTextField) tabComp[i]).setText(ClientDet.get("PHONE")); break;
-						case "EMAIL": ((JTextField) tabComp[i]).setText(ClientDet.get("EMAIL")); break;
-						default: System.out.println("Error in getting Client Details");
-					}
-				}
-				
-			}
-		}
-		
-		else if(selectedTab.getTitleAt(selectedTab.getSelectedIndex()).equals("Event")){
-			
-			Component[] tabComp = ((JPanel)(tabPan.getComponents()[1])).getComponents();
-			
-			for(int i=0; i< tabComp.length;i++)
-			{
-				
-				if(tabComp[i].getName() != null){
-					//System.out.println("Event: "+tabComp[i]);
-					switch(tabComp[i].getName()){
-						case "EVNAME":((JTextField) tabComp[i]).setText((String)cmbSelEvent.getSelectedItem());break;
-						case "DATE": ((JTextField) tabComp[i]).setText(EventDet.get("DATE")); break;
-						case "TIME": ((JTextField) tabComp[i]).setText(EventDet.get("TIME")); break;
-						case "OB": 	if(EventDet.get("VENUE") == "OUR BANQUET"){
-										((JRadioButton)tabComp[i]).setSelected(true);
-									}break;
-						case "O":	if(EventDet.get("VENUE") != "OUR BANQUET"){
-									((JRadioButton)tabComp[i]).setSelected(true);
-								}break;
-						case "OTHER":if(EventDet.get("VENUE") != "OUR BANQUET"){
-									((JTextField)tabComp[i]).setEnabled(true);
-									((JTextField)tabComp[i]).setText(EventDet.get("VENUE"));
-								}break;
-						case "ATTEND": ((JTextField) tabComp[i]).setText(EventDet.get("ATTEND")); break;
-						case "NOTE_SCROLL": ((JTextArea) (((JScrollPane) tabComp[i]).getViewport()).getView()).setText(EventDet.get("NOTES")); break;
-						default: System.out.println("Error in getting Event Details");
-					}
-				}
-				
-			}
-		}//end else if for event
-		
-		else if(selectedTab.getTitleAt(selectedTab.getSelectedIndex()).equals("Drinks")){
+		/*else if(selectedTab.getTitleAt(selectedTab.getSelectedIndex()).equals("Drinks")){
 			
 			Component[] tabComp = ((JPanel)(tabPan.getComponents()[2])).getComponents();
 			
@@ -400,6 +443,7 @@ public class UpdateEvent {
 				
 			}
 		}//end else if for desserts
+		*/
 		
 	}//end selTab method
 }//end UpdateEvent class
