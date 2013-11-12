@@ -101,7 +101,9 @@ public class CommonMethods {
 	JTextField txtDessert7 = new JTextField("0");
 	JTextField txtDessert8 = new JTextField("0");
 	JTextField txtDessert9 = new JTextField("0");
-
+	
+	JTextField txtPayment;
+	
 	JTextArea txtNotes;
 	JRadioButton rdbtnOurBanquet, rdbtnOther;
 	ButtonGroup rdbtnGroupVenue;
@@ -111,7 +113,7 @@ public class CommonMethods {
 	// tabs for order info
 	JTabbedPane tabpnlAdd2;
 
-	
+	//labels for the Invoice tab
 	JLabel lblDrinkInvoiceValue;
 	JLabel lblSnackInvoiceValue; 
 	JLabel lblEntreeInvoiceValue;	
@@ -124,6 +126,7 @@ public class CommonMethods {
 	JLabel lblAmntPaidFinalValue; 
 	JLabel lblAmntDueFinalValue;
 	
+	//labels for the subtotals on the Order forms
 	JLabel dSubtotal;
 	JLabel sSubtotal;
 	JLabel eSubtotal;
@@ -277,11 +280,8 @@ public class CommonMethods {
 	double snackSubtotal = 0;
 	double entreeSubtotal = 0;
 	double dessertSubtotal = 0;
-	
 	double totalFoodSubtotal = 0;
-	
 	double totalTaxSubtotal = 0;
-	
 	double totalLaborSubtotal = 0;
 	double totalItemsCost = 0;
 	double totalLaborHrs = 0;
@@ -290,7 +290,7 @@ public class CommonMethods {
 	double amountPaid = 0;
 	double amountDue = 0;
 
-	JTextField txtPayment;
+	
 
 	// Calculation methods
 	String calcDrinkSubtotal() {
@@ -298,11 +298,8 @@ public class CommonMethods {
 		for (int i = 0; i < drinkQnty.length; i++) {
 			drinkSubtotal = drinkSubtotal
 					+ (drinkQnty[i] * (double) drinkArray[i][2]);
-			
 		}
-		
 		return String.valueOf(drinkSubtotal);
-		
 	}
 
 	String calcSnacksSubtotal() {
@@ -311,7 +308,6 @@ public class CommonMethods {
 			snackSubtotal = snackSubtotal
 					+ (snackQnty[i] * (double) snackArray[i][2]);
 		}
-		
 		return String.valueOf(snackSubtotal);
 	}
 
@@ -321,7 +317,6 @@ public class CommonMethods {
 			entreeSubtotal = entreeSubtotal
 					+ (entreeQnty[i] * (double) entreeArray[i][2]);
 		}
-		
 		return String.valueOf(entreeSubtotal);
 	}
 
@@ -331,7 +326,6 @@ public class CommonMethods {
 			dessertSubtotal = dessertSubtotal
 					+ (dessertQnty[i] * (double) dessertArray[i][2]);
 		}
-		
 		return String.valueOf(dessertSubtotal);
 	}
 
@@ -361,7 +355,6 @@ public class CommonMethods {
 		return String.valueOf(totalItemsCost);
 	}
 	
-	
 	String calcDepositAmount() {
 		
 		if ((totalItemsCost * 0.5) < 500 && totalItemsCost > 500) {
@@ -389,7 +382,6 @@ public class CommonMethods {
 	String calcAmountDue(){
 		
 		amountDue = totalItemsCost - amountPaid;
-		
 		return String.valueOf(amountDue);
 	}
 	
@@ -945,7 +937,6 @@ public class CommonMethods {
 				pnlInvoice.add(lblAmntDueFinalValue);
 
 
-
 		JButton btnDone = new JButton("ENTER");
 		btnDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1206,6 +1197,7 @@ public class CommonMethods {
 					calcTotalLaborSubtotal();
 					calcTotalItemsCost();
 					calcDepositAmount();
+					calcAmountPaid();
 					calcAmountDue();
 					
 					lblAmntDueFinalValue.setText(calcAmountDue());
@@ -1332,6 +1324,7 @@ public class CommonMethods {
 					calcTotalLaborSubtotal();
 					calcTotalItemsCost();
 					calcDepositAmount();
+					calcAmountPaid();
 					calcAmountDue();
 				
 					lblAmntDueFinalValue.setText(calcAmountDue());
@@ -1456,6 +1449,7 @@ public class CommonMethods {
 					calcTotalLaborSubtotal();
 					calcTotalItemsCost();
 					calcDepositAmount();
+					calcAmountPaid();
 					calcAmountDue();
 					
 					lblAmntDueFinalValue.setText(calcAmountDue());
@@ -1585,6 +1579,7 @@ public class CommonMethods {
 					calcTotalLaborSubtotal();
 					calcTotalItemsCost();
 					calcDepositAmount();
+					calcAmountPaid();
 					calcAmountDue();
 					
 					lblAmntDueFinalValue.setText(calcAmountDue());

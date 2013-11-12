@@ -51,7 +51,6 @@ public class UpdateEvent {
 	EntreeDet, DessertDet;
 	ArrayList<HashMap<String,String>> arrTemp;
 	
-	
 	/**
 	 * Create the application.
 	 */
@@ -228,8 +227,6 @@ public class UpdateEvent {
 							}
 						}//end for loop tabCompClient that goes through array of client data fields
 							
-											
-					
 						Component[] tabCompEvent = ((JPanel)(tabPan.getComponents()[1])).getComponents();
 						for(int i=0; i< tabCompEvent.length;i++)
 						{
@@ -441,43 +438,43 @@ public class UpdateEvent {
 								switch(tabCompDesserts[i].getName()){
 									case "DESSERT0":  
 										if(eElement.getElementsByTagName("DE_QNTY0").item(0) != null)
-											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY0").item(0).getTextContent()); 
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("DE_QNTY0").item(0).getTextContent()); 
 										break;
 									case "DESSERT1":  
 										if(eElement.getElementsByTagName("DE_QNTY1").item(0) != null)
-											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY1").item(0).getTextContent()); 
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("DE_QNTY1").item(0).getTextContent()); 
 										break;
 									case "DESSERT2":  
 										if(eElement.getElementsByTagName("DE_QNTY2").item(0) != null)
-											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY2").item(0).getTextContent()); 
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("DE_QNTY2").item(0).getTextContent()); 
 										break;	
 									case "DESSERT3":  
 										if(eElement.getElementsByTagName("DE_QNTY3").item(0) != null)
-											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY3").item(0).getTextContent()); 
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("DE_QNTY3").item(0).getTextContent()); 
 										break;
 									case "DESSERT4":  
 										if(eElement.getElementsByTagName("DE_QNTY4").item(0) != null)
-											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY4").item(0).getTextContent()); 
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("DE_QNTY4").item(0).getTextContent()); 
 										break;
 									case "DESSERT5":  
 										if(eElement.getElementsByTagName("DE_QNTY5").item(0) != null)
-											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY5").item(0).getTextContent()); 
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("DE_QNTY5").item(0).getTextContent()); 
 										break;
 									case "DESSERT6":  
 										if(eElement.getElementsByTagName("DE_QNTY6").item(0) != null)
-											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY6").item(0).getTextContent()); 
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("DE_QNTY6").item(0).getTextContent()); 
 										break;
 									case "DESSERT7":  
 										if(eElement.getElementsByTagName("DE_QNTY7").item(0) != null)
-											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY7").item(0).getTextContent()); 
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("DE_QNTY7").item(0).getTextContent()); 
 										break;
 									case "DESSERT8":  
 										if(eElement.getElementsByTagName("DE_QNTY8").item(0) != null)
-											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY8").item(0).getTextContent()); 
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("DE_QNTY8").item(0).getTextContent()); 
 										break;
 									case "DESSERT9":  
 										if(eElement.getElementsByTagName("DE_QNTY9").item(0) != null)
-											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY8").item(0).getTextContent()); 
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("DE_QNTY9").item(0).getTextContent()); 
 										break;
 									case "DE_SUB":
 										if(eElement.getElementsByTagName("DE_SUB").item(0) != null)
@@ -488,7 +485,6 @@ public class UpdateEvent {
 							}//end if statement
 							
 						}//end for loop
-						
 						
 						
 						Component[] tabCompInvoice = ((JPanel)(tabPan.getComponents()[3])).getComponents();
@@ -544,20 +540,6 @@ public class UpdateEvent {
 								}//end switch statement
 							}//end if statement
 						}//end for loop 
-						
-						
-						
-						
-						
-						
-						
-						
-						
-						
-						
-						
-						
-						
 					}//if the node element of given name is found
 				}//if the element is a node element
 			}//end for loop to find all elements by tag name = selected name
