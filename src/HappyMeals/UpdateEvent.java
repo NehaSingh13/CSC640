@@ -6,6 +6,7 @@ package HappyMeals;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,6 +46,7 @@ public class UpdateEvent {
 	
 	JComboBox<Object> cmbSelEvent;
 	JTabbedPane tabPan;
+	
 	HashMap<String,String> ClientDet,EventDet,DrinkDet,SnackDet,
 	EntreeDet, DessertDet;
 	ArrayList<HashMap<String,String>> arrTemp;
@@ -76,7 +78,10 @@ public class UpdateEvent {
 		
 		//get the tab panel from common and add it to this panel
 		tabPan = objCommon.getTabsUpdate();
+	
 		tabPan.setVisible(false);
+		
+		
 		ChangeListener changeListener = new ChangeListener() {
 		      public void stateChanged(ChangeEvent changeEvent) {
 		        JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
@@ -221,7 +226,7 @@ public class UpdateEvent {
 									default: System.out.println("Error in setting Client Name");
 								}
 							}
-						}
+						}//end for loop tabCompClient that goes through array of client data fields
 							
 											
 					
@@ -246,53 +251,323 @@ public class UpdateEvent {
 									case "ATTEND": ((JTextField) tabCompEvent[i]).setText(eElement.getElementsByTagName("ATTEND").item(0).getTextContent()); break;
 									case "NOTE_SCROLL": ((JTextArea) (((JScrollPane) tabCompEvent[i]).getViewport()).getView()).setText(eElement.getElementsByTagName("NOTES").item(0).getTextContent()); break;
 									default: System.out.println("Error in getting Event Details");
-								}
-							}
-						}
+								}//end switch statement
+							}//end if statement
+						}//end for loop tabCompEvent that goes through array of event data fields
 						
 						
-						/*
-						 * Stephen:
-						 * There is no name attached to the textboxes in panels on Order tab, that is why it is returning as null and will never be populated from the DB
-						 *  
-						 */
-						JTabbedPane tabCompOrder = objCommon.getTabsOrder();
-						//Component[] tabCompOrder = ((JPanel)(tabPan.getComponents()[2])).getComponents();
-						Component[] tabCompDrinks = ((JPanel)(tabCompOrder.getComponents()[0])).getComponents();
+						Component[] tabCompDrinks = ((Container) ((JTabbedPane) ((JPanel)(tabPan.getComponents()[2])).getComponents()[0]).getComponents()[0]).getComponents();
+                        //                                                               //this gets Order panel
+						//													                                  //JTabbedPane from getTabsOrder call
+						//                                                                                                               //component at 0 is Drinks
+						//                                                                                                                                   //gets Drink components
+						 
 						for(int i=0; i< tabCompDrinks.length;i++)
 						{
-							System.out.println(tabCompDrinks[i].getName());
 							if(tabCompDrinks[i].getName() != null){
-								System.out.println(tabCompDrinks[i].getName());
 								switch(tabCompDrinks[i].getName()){
-									case "DRINK0": 
-										if(eElement.getElementsByTagName("DATE").item(0) != null)
-											((JTextField) tabCompDrinks[i]).setText(eElement.getElementsByTagName("DATE").item(0).getTextContent()); 
+									case "DRINK0":  
+										if(eElement.getElementsByTagName("DR_QNTY0").item(0) != null){
+											((JTextField) tabCompDrinks[i]).setText(eElement.getElementsByTagName("DR_QNTY0").item(0).getTextContent());
+										}
+											break;
+									case "DRINK1":  
+										if(eElement.getElementsByTagName("DR_QNTY1").item(0) != null)
+											((JTextField) tabCompDrinks[i]).setText(eElement.getElementsByTagName("DR_QNTY1").item(0).getTextContent()); 
 										break;
-									/*case "DRINK1": ((JTextField) tabCompDrinks[i]).setText(DrinkDet.get("DRINK1")); break;
-									case "DRINK2": ((JTextField) tabCompDrinks[i]).setText(DrinkDet.get("DRINK2")); break;
-									case "DRINK3": ((JTextField) tabCompDrinks[i]).setText(DrinkDet.get("DRINK3")); break;
-									case "DRINK4": ((JTextField) tabCompDrinks[i]).setText(DrinkDet.get("DRINK4")); break;
-									case "DRINK5": ((JTextField) tabCompDrinks[i]).setText(DrinkDet.get("DRINK5")); break;
-									case "DRINK6": ((JTextField) tabCompDrinks[i]).setText(DrinkDet.get("DRINK6")); break;
-									case "DRINK7": ((JTextField) tabCompDrinks[i]).setText(DrinkDet.get("DRINK7")); break;
-									case "DRINK8": ((JTextField) tabCompDrinks[i]).setText(DrinkDet.get("DRINK8")); break;*/
+									case "DRINK2":  
+										if(eElement.getElementsByTagName("DR_QNTY2").item(0) != null)
+											((JTextField) tabCompDrinks[i]).setText(eElement.getElementsByTagName("DR_QNTY2").item(0).getTextContent()); 
+										break;	
+									case "DRINK3":  
+										if(eElement.getElementsByTagName("DR_QNTY3").item(0) != null)
+											((JTextField) tabCompDrinks[i]).setText(eElement.getElementsByTagName("DR_QNTY3").item(0).getTextContent()); 
+										break;
+									case "DRINK4":  
+										if(eElement.getElementsByTagName("DR_QNTY4").item(0) != null)
+											((JTextField) tabCompDrinks[i]).setText(eElement.getElementsByTagName("DR_QNTY4").item(0).getTextContent()); 
+										break;
+									case "DRINK5":  
+										if(eElement.getElementsByTagName("DR_QNTY5").item(0) != null)
+											((JTextField) tabCompDrinks[i]).setText(eElement.getElementsByTagName("DR_QNTY5").item(0).getTextContent()); 
+										break;
+									case "DRINK6":  
+										if(eElement.getElementsByTagName("DR_QNTY6").item(0) != null)
+											((JTextField) tabCompDrinks[i]).setText(eElement.getElementsByTagName("DR_QNTY6").item(0).getTextContent()); 
+										break;
+									case "DRINK7":  
+										if(eElement.getElementsByTagName("DR_QNTY7").item(0) != null)
+											((JTextField) tabCompDrinks[i]).setText(eElement.getElementsByTagName("DR_QNTY7").item(0).getTextContent()); 
+										break;
+									case "DRINK8":  
+										if(eElement.getElementsByTagName("DR_QNTY8").item(0) != null)
+											((JTextField) tabCompDrinks[i]).setText(eElement.getElementsByTagName("DR_QNTY8").item(0).getTextContent()); 
+										break;
+									case "DR_SUB":
+										if(eElement.getElementsByTagName("DR_SUB").item(0) != null)
+											((JLabel) tabCompDrinks[i]).setText(eElement.getElementsByTagName("DR_SUB").item(0).getTextContent()); 
+										break;
+										
 									default: System.out.println("Error in getting Drink Details");
-								}
-							}
+								}//end switch statement
+							}//end if statement
 							
-						}
+						}//end for loop tabCompDrinks that goes through array of drink data fields
+						
+					
+						Component[] tabCompSnacks = ((Container) ((JTabbedPane) ((JPanel)(tabPan.getComponents()[2])).getComponents()[0]).getComponents()[1]).getComponents();
+                        //                                                               //this gets Order panel
+						//													                                  //JTabbedPane from getTabsOrder call
+						//                                                                                                               //component at 1 is Snacks
+						//                                                                                                                                   //gets Snacks components
+						 
+						for(int i=0; i< tabCompSnacks.length;i++)
+						{
+							if(tabCompSnacks[i].getName() != null){
+								switch(tabCompSnacks[i].getName()){
+									case "SNACK0":  
+										if(eElement.getElementsByTagName("SN_QNTY0").item(0) != null)
+											((JTextField) tabCompSnacks[i]).setText(eElement.getElementsByTagName("SN_QNTY0").item(0).getTextContent()); 
+										break;
+									case "SNACK1":  
+										if(eElement.getElementsByTagName("SN_QNTY1").item(0) != null)
+											((JTextField) tabCompSnacks[i]).setText(eElement.getElementsByTagName("SN_QNTY1").item(0).getTextContent()); 
+										break;
+									case "SNACK2":  
+										if(eElement.getElementsByTagName("SN_QNTY2").item(0) != null)
+											((JTextField) tabCompSnacks[i]).setText(eElement.getElementsByTagName("SN_QNTY2").item(0).getTextContent()); 
+										break;	
+									case "SNACK3":  
+										if(eElement.getElementsByTagName("SN_QNTY3").item(0) != null)
+											((JTextField) tabCompSnacks[i]).setText(eElement.getElementsByTagName("SN_QNTY3").item(0).getTextContent()); 
+										break;
+									case "SNACK4":  
+										if(eElement.getElementsByTagName("SN_QNTY4").item(0) != null)
+											((JTextField) tabCompSnacks[i]).setText(eElement.getElementsByTagName("SN_QNTY4").item(0).getTextContent()); 
+										break;
+									case "SNACK5":  
+										if(eElement.getElementsByTagName("SN_QNTY5").item(0) != null)
+											((JTextField) tabCompSnacks[i]).setText(eElement.getElementsByTagName("SN_QNTY5").item(0).getTextContent()); 
+										break;
+									case "SNACK6":  
+										if(eElement.getElementsByTagName("SN_QNTY6").item(0) != null)
+											((JTextField) tabCompSnacks[i]).setText(eElement.getElementsByTagName("SN_QNTY6").item(0).getTextContent()); 
+										break;
+									case "SNACK7":  
+										if(eElement.getElementsByTagName("SN_QNTY7").item(0) != null)
+											((JTextField) tabCompSnacks[i]).setText(eElement.getElementsByTagName("SN_QNTY7").item(0).getTextContent()); 
+										break;
+									case "SNACK8":  
+										if(eElement.getElementsByTagName("SN_QNTY8").item(0) != null)
+											((JTextField) tabCompSnacks[i]).setText(eElement.getElementsByTagName("SN_QNTY8").item(0).getTextContent()); 
+										break;
+									case "SN_SUB":
+										if(eElement.getElementsByTagName("SN_SUB").item(0) != null)
+											((JLabel) tabCompSnacks[i]).setText(eElement.getElementsByTagName("SN_SUB").item(0).getTextContent()); 
+										break;
+										
+									default: System.out.println("Error in getting Snack Details");
+								}//end switch statement
+							}//end if statement
+							
+						}//end for loop 
+						
+						Component[] tabCompEntrees = ((Container) ((JTabbedPane) ((JPanel)(tabPan.getComponents()[2])).getComponents()[0]).getComponents()[2]).getComponents();
+                        //                                                               //this gets Order panel
+						//													                                  //JTabbedPane from getTabsOrder call
+						//                                                                                                               //component at 2 is Entrees
+						//                                                                                                                                   //gets Entree components
+						 
+						for(int i=0; i< tabCompEntrees.length;i++)
+						{
+							if(tabCompEntrees[i].getName() != null){
+								switch(tabCompEntrees[i].getName()){
+									case "ENTREE0":  
+										if(eElement.getElementsByTagName("EN_QNTY0").item(0) != null)
+											((JTextField) tabCompEntrees[i]).setText(eElement.getElementsByTagName("EN_QNTY0").item(0).getTextContent()); 
+										break;
+									case "ENTREE1":  
+										if(eElement.getElementsByTagName("EN_QNTY1").item(0) != null)
+											((JTextField) tabCompEntrees[i]).setText(eElement.getElementsByTagName("EN_QNTY1").item(0).getTextContent()); 
+										break;
+									case "ENTREE2":  
+										if(eElement.getElementsByTagName("EN_QNTY2").item(0) != null)
+											((JTextField) tabCompEntrees[i]).setText(eElement.getElementsByTagName("EN_QNTY2").item(0).getTextContent()); 
+										break;	
+									case "ENTREE3":  
+										if(eElement.getElementsByTagName("EN_QNTY3").item(0) != null)
+											((JTextField) tabCompEntrees[i]).setText(eElement.getElementsByTagName("EN_QNTY3").item(0).getTextContent()); 
+										break;
+									case "ENTREE4":  
+										if(eElement.getElementsByTagName("EN_QNTY4").item(0) != null)
+											((JTextField) tabCompEntrees[i]).setText(eElement.getElementsByTagName("EN_QNTY4").item(0).getTextContent()); 
+										break;
+									case "ENTREE5":  
+										if(eElement.getElementsByTagName("EN_QNTY5").item(0) != null)
+											((JTextField) tabCompEntrees[i]).setText(eElement.getElementsByTagName("EN_QNTY5").item(0).getTextContent()); 
+										break;
+									case "ENTREE6":  
+										if(eElement.getElementsByTagName("EN_QNTY6").item(0) != null)
+											((JTextField) tabCompEntrees[i]).setText(eElement.getElementsByTagName("EN_QNTY6").item(0).getTextContent()); 
+										break;
+									case "ENTREE7":  
+										if(eElement.getElementsByTagName("EN_QNTY7").item(0) != null)
+											((JTextField) tabCompEntrees[i]).setText(eElement.getElementsByTagName("EN_QNTY7").item(0).getTextContent()); 
+										break;
+									case "ENTREE8":  
+										if(eElement.getElementsByTagName("EN_QNTY8").item(0) != null)
+											((JTextField) tabCompEntrees[i]).setText(eElement.getElementsByTagName("EN_QNTY8").item(0).getTextContent()); 
+										break;
+									case "EN_SUB":
+										if(eElement.getElementsByTagName("EN_SUB").item(0) != null)
+											((JLabel) tabCompEntrees[i]).setText(eElement.getElementsByTagName("EN_SUB").item(0).getTextContent()); 
+										break;
+									default: System.out.println("Error in getting Entree Details");
+								}//end switch statement
+							}//end if statement
+							
+						}//end for loop
 						
 						
-					}
-				}
-			}
-		}
+						Component[] tabCompDesserts = ((Container) ((JTabbedPane) ((JPanel)(tabPan.getComponents()[2])).getComponents()[0]).getComponents()[3]).getComponents();
+                        //                                                               //this gets Order panel
+						//													                                  //JTabbedPane from getTabsOrder call
+						//                                                                                                               //component at 3 is Desserts
+						//                                                                                                                                   //gets Dessert components
+						 
+						for(int i=0; i< tabCompDesserts.length;i++)
+						{
+							if(tabCompDesserts[i].getName() != null){
+								switch(tabCompDesserts[i].getName()){
+									case "DESSERT0":  
+										if(eElement.getElementsByTagName("DE_QNTY0").item(0) != null)
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY0").item(0).getTextContent()); 
+										break;
+									case "DESSERT1":  
+										if(eElement.getElementsByTagName("DE_QNTY1").item(0) != null)
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY1").item(0).getTextContent()); 
+										break;
+									case "DESSERT2":  
+										if(eElement.getElementsByTagName("DE_QNTY2").item(0) != null)
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY2").item(0).getTextContent()); 
+										break;	
+									case "DESSERT3":  
+										if(eElement.getElementsByTagName("DE_QNTY3").item(0) != null)
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY3").item(0).getTextContent()); 
+										break;
+									case "DESSERT4":  
+										if(eElement.getElementsByTagName("DE_QNTY4").item(0) != null)
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY4").item(0).getTextContent()); 
+										break;
+									case "DESSERT5":  
+										if(eElement.getElementsByTagName("DE_QNTY5").item(0) != null)
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY5").item(0).getTextContent()); 
+										break;
+									case "DESSERT6":  
+										if(eElement.getElementsByTagName("DE_QNTY6").item(0) != null)
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY6").item(0).getTextContent()); 
+										break;
+									case "DESSERT7":  
+										if(eElement.getElementsByTagName("DE_QNTY7").item(0) != null)
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY7").item(0).getTextContent()); 
+										break;
+									case "DESSERT8":  
+										if(eElement.getElementsByTagName("DE_QNTY8").item(0) != null)
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY8").item(0).getTextContent()); 
+										break;
+									case "DESSERT9":  
+										if(eElement.getElementsByTagName("DE_QNTY9").item(0) != null)
+											((JTextField) tabCompDesserts[i]).setText(eElement.getElementsByTagName("EN_QNTY8").item(0).getTextContent()); 
+										break;
+									case "DE_SUB":
+										if(eElement.getElementsByTagName("DE_SUB").item(0) != null)
+											((JLabel) tabCompDesserts[i]).setText(eElement.getElementsByTagName("DE_SUB").item(0).getTextContent()); 
+										break;
+									default: System.out.println("Error in getting Dessert Details");
+								}//end switch statement
+							}//end if statement
+							
+						}//end for loop
+						
+						
+						
+						Component[] tabCompInvoice = ((JPanel)(tabPan.getComponents()[3])).getComponents();
+						for(int i=0; i< tabCompInvoice.length;i++)
+						{
+							if(tabCompInvoice[i].getName() != null){
+								switch(tabCompInvoice[i].getName()){
+									case "DR_SUB_INV":
+										if(eElement.getElementsByTagName("DR_SUB_INV").item(0) != null)
+										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("DR_SUB_INV").item(0).getTextContent()); break;
+									
+									case "SN_SUB_INV":
+										if(eElement.getElementsByTagName("SN_SUB_INV").item(0) != null)
+										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("SN_SUB_INV").item(0).getTextContent()); break;
+									
+									case "EN_SUB_INV":
+										if(eElement.getElementsByTagName("EN_SUB_INV").item(0) != null)
+										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("EN_SUB_INV").item(0).getTextContent()); break;
+									
+									case "DE_SUB_INV":
+										if(eElement.getElementsByTagName("DE_SUB_INV").item(0) != null)
+										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("DE_SUB_INV").item(0).getTextContent()); break;
+										
+									case "TXV_SUB":
+										if(eElement.getElementsByTagName("TXV_SUB").item(0) != null)
+										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("TXV_SUB").item(0).getTextContent()); break;
+										
+									case "LV_SUB":
+										if(eElement.getElementsByTagName("LV_SUB").item(0) != null)
+										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("LV_SUB").item(0).getTextContent()); break;
+										
+									case "TOT_SUB":
+										if(eElement.getElementsByTagName("TOT_SUB").item(0) != null)
+										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("TOT_SUB").item(0).getTextContent()); break;
+										
+									case "BAL_SUB":
+										if(eElement.getElementsByTagName("BAL_SUB").item(0) != null)
+										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("BAL_SUB").item(0).getTextContent()); break;
+										
+									case "TFV_SUB":
+										if(eElement.getElementsByTagName("TFV_SUB").item(0) != null)
+										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("TFV_SUB").item(0).getTextContent()); break;
+										
+									case "APFV_SUB":
+										if(eElement.getElementsByTagName("APFV_SUB").item(0) != null)
+										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("APFV_SUB").item(0).getTextContent()); break;
+										
+									case "ADFV_SUB":
+										if(eElement.getElementsByTagName("ADFV_SUB").item(0) != null)
+										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("ADFV_SUB").item(0).getTextContent()); break;
+									
+									default: System.out.println("Error in getting Invoice Details");
+								}//end switch statement
+							}//end if statement
+						}//end for loop 
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+					}//if the node element of given name is found
+				}//if the element is a node element
+			}//end for loop to find all elements by tag name = selected name
+		}//end try
 		catch (Exception ex) {
 			ex.printStackTrace();
 		}						
 
-	}
+	}//end populateTabs method
+	
 	private void selTab(JTabbedPane selectedTab){
 		//arrTemp = CommonMethods.hmEvents.get(cmbSelEvent.getSelectedItem());
 		//System.out.println(arrTemp.get(0));
