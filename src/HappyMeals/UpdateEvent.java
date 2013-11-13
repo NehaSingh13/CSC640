@@ -516,14 +516,14 @@ public class UpdateEvent {
 										if(eElement.getElementsByTagName("LV_SUB").item(0) != null)
 										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("LV_SUB").item(0).getTextContent()); break;
 										
-									case "TOT_SUB":
-										if(eElement.getElementsByTagName("TOT_SUB").item(0) != null)
-										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("TOT_SUB").item(0).getTextContent()); break;
-										
 									case "BAL_SUB":
 										if(eElement.getElementsByTagName("BAL_SUB").item(0) != null)
 										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("BAL_SUB").item(0).getTextContent()); break;
 										
+									case "BAL_REM_SUB":
+										if(eElement.getElementsByTagName("BAL_REM_SUB").item(0) != null)
+										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("BAL_REM_SUB").item(0).getTextContent()); break;
+									
 									case "TFV_SUB":
 										if(eElement.getElementsByTagName("TFV_SUB").item(0) != null)
 										((JLabel) tabCompInvoice[i]).setText(eElement.getElementsByTagName("TFV_SUB").item(0).getTextContent()); break;

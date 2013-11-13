@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,10 +51,12 @@ import org.xml.sax.SAXException;
 
 public class CommonMethods {
 
-	Color c = new Color(255, 0, 0);
+	Color red = new Color(255, 0, 0);
 	Color blue = new Color(59,89,152);
-	Color green = new Color(0,51,34);
+	Color pink = new Color(248, 17, 159);
 
+	DecimalFormat df = new DecimalFormat("0.00");
+	
 	JPanel pnlEvent, pnlClient, pnlOrder, pnlInvoice;
 
 	// txt fields for client info
@@ -119,9 +122,9 @@ public class CommonMethods {
 	JLabel lblEntreeInvoiceValue;	
 	JLabel lblDessertInvoiceValue; 
 	JLabel lblTaxInvoiceValue; 	
-	JLabel lblLaborValue; 	
-	JLabel lblTotalInvoiceValue;	
-	JLabel lblBalanceDueValue; 	
+	JLabel lblLaborValue; 		
+	JLabel lblBalanceDueValue;
+	JLabel lblBalanceRemainingValue;
 	JLabel lblTotalFinalValue; 	
 	JLabel lblAmntPaidFinalValue; 
 	JLabel lblAmntDueFinalValue;
@@ -287,6 +290,7 @@ public class CommonMethods {
 	double totalLaborHrs = 0;
 
 	double depositAmount = 0;
+	double depositRemaining = 0;
 	double amountPaid = 0;
 	double amountDue = 0;
 
@@ -299,7 +303,7 @@ public class CommonMethods {
 			drinkSubtotal = drinkSubtotal
 					+ (drinkQnty[i] * (double) drinkArray[i][2]);
 		}
-		return String.valueOf(drinkSubtotal);
+		return df.format(drinkSubtotal);
 	}
 
 	String calcSnacksSubtotal() {
@@ -308,7 +312,7 @@ public class CommonMethods {
 			snackSubtotal = snackSubtotal
 					+ (snackQnty[i] * (double) snackArray[i][2]);
 		}
-		return String.valueOf(snackSubtotal);
+		return df.format(snackSubtotal);
 	}
 
 	String calcEntreeSubtotal() {
@@ -317,7 +321,7 @@ public class CommonMethods {
 			entreeSubtotal = entreeSubtotal
 					+ (entreeQnty[i] * (double) entreeArray[i][2]);
 		}
-		return String.valueOf(entreeSubtotal);
+		return df.format(entreeSubtotal);
 	}
 
 	String calcDessertSubtotal() {
@@ -326,33 +330,33 @@ public class CommonMethods {
 			dessertSubtotal = dessertSubtotal
 					+ (dessertQnty[i] * (double) dessertArray[i][2]);
 		}
-		return String.valueOf(dessertSubtotal);
+		return df.format(dessertSubtotal);
 	}
 
 	String calcTotalFoodSubtotal() {
 		totalFoodSubtotal = drinkSubtotal + snackSubtotal + entreeSubtotal
 				+ dessertSubtotal;
 		
-		return String.valueOf(totalFoodSubtotal);
+		return df.format(totalFoodSubtotal);
 	}
 
 	String calcTotalTaxSubtotal() {
 		totalTaxSubtotal = Double.parseDouble(calcTotalFoodSubtotal()) * SALES_TAX;
 		
-		return String.valueOf(totalTaxSubtotal);
+		return df.format(totalTaxSubtotal);
 	}
 
 	String calcTotalLaborSubtotal() {
 		totalLaborSubtotal = totalFoodSubtotal * LABOR_RATE;
 		
-		return String.valueOf(totalLaborSubtotal);
+		return df.format(totalLaborSubtotal);
 	}
 
 	String calcTotalItemsCost() {
 		totalItemsCost = totalFoodSubtotal + totalTaxSubtotal
 				+ totalLaborSubtotal;
 		
-		return String.valueOf(totalItemsCost);
+		return df.format(totalItemsCost);
 	}
 	
 	String calcDepositAmount() {
@@ -367,22 +371,36 @@ public class CommonMethods {
 			depositAmount = totalItemsCost * 0.5;
 		}
 
-		return String.valueOf(depositAmount);
+		return df.format(depositAmount);
 	}
 	
 	
 	String calcAmountPaid(){
 		
+		if(txtPayment.getText().equals("")){
+			txtPayment.setText("0");
+		}
+		
 		amountPaid = (Double.parseDouble(lblAmntPaidFinalValue.getText()));
 		amountPaid += Double.parseDouble(txtPayment.getText());
-		return String.valueOf(amountPaid);
+		return df.format(amountPaid);
 	}
 	
+	String calcDepositRemaining(){
+		
+		double diff = depositAmount - amountPaid;
+		if(diff < 0)
+			depositRemaining=0;
+		else
+			depositRemaining = diff;
+		return df.format(depositRemaining);
+		
+	}
 	
 	String calcAmountDue(){
 		
 		amountDue = totalItemsCost - amountPaid;
-		return String.valueOf(amountDue);
+		return df.format(amountDue);
 	}
 	
 	void setAmountPaid(double amount) {
@@ -858,13 +876,13 @@ public class CommonMethods {
 		lblLaborHeader.setBounds(1, 150, 100, 25);
 		pnlInvoice.add(lblLaborHeader);
 
-		JLabel lblTotalInvoiceHeader = new JLabel("Total:  ");
-		lblTotalInvoiceHeader.setBounds(1, 175, 100, 25);
-		pnlInvoice.add(lblTotalInvoiceHeader);
-
-		JLabel lblBalanceDueHeader = new JLabel("Deposit Due:  ");
-		lblBalanceDueHeader.setBounds(1, 200, 100, 25);
+		JLabel lblBalanceDueHeader = new JLabel("Total Deposit Due:  ");
+		lblBalanceDueHeader.setBounds(1, 175, 150, 25);
 		pnlInvoice.add(lblBalanceDueHeader);
+		
+		JLabel lblBalanceRemainingHeader = new JLabel("Deposit Balance Due:  ");
+		lblBalanceRemainingHeader.setBounds(1, 200, 150, 25);
+		pnlInvoice.add(lblBalanceRemainingHeader);
 
 		JLabel lblTotalFinal = new JLabel("Total:  ");
 		lblTotalFinal.setBounds(285, 25, 100, 25);
@@ -878,48 +896,48 @@ public class CommonMethods {
 		lblAmntDueFinal.setBounds(285, 75, 100, 25);
 		pnlInvoice.add(lblAmntDueFinal);
 
-		lblDrinkInvoiceValue = new JLabel(Double.toString(drinkSubtotal));
+		lblDrinkInvoiceValue = new JLabel(df.format(drinkSubtotal));
 		lblDrinkInvoiceValue.setName("DR_SUB_INV");
 		
-		lblSnackInvoiceValue = new JLabel(Double.toString(snackSubtotal));
+		lblSnackInvoiceValue = new JLabel(df.format(snackSubtotal));
 		lblSnackInvoiceValue.setName("SN_SUB_INV");
 		
-		lblEntreeInvoiceValue = new JLabel(Double.toString(entreeSubtotal));
+		lblEntreeInvoiceValue = new JLabel(df.format(entreeSubtotal));
 		lblEntreeInvoiceValue.setName("EN_SUB_INV");
 		
-		lblDessertInvoiceValue = new JLabel(Double.toString(dessertSubtotal));
+		lblDessertInvoiceValue = new JLabel(df.format(dessertSubtotal));
 		lblDessertInvoiceValue.setName("DE_SUB_INV");
 		
-		lblTaxInvoiceValue = new JLabel(Double.toString(totalTaxSubtotal));
+		lblTaxInvoiceValue = new JLabel(df.format(totalTaxSubtotal));
 		lblTaxInvoiceValue.setName("TXV_SUB");
 		
-		lblLaborValue = new JLabel(Double.toString(totalLaborSubtotal));
+		lblLaborValue = new JLabel(df.format(totalLaborSubtotal));
 		lblLaborValue.setName("LV_SUB");
 		
-		lblTotalInvoiceValue = new JLabel(Double.toString(totalItemsCost));
-		lblTotalInvoiceValue.setName("TOT_SUB");
-		
-		lblBalanceDueValue = new JLabel(Double.toString(totalItemsCost * .5));
+		lblBalanceDueValue = new JLabel(df.format(totalItemsCost * .5));
 		lblBalanceDueValue.setName("BAL_SUB");
 		
-		lblTotalFinalValue = new JLabel(Double.toString(totalItemsCost));
+		lblBalanceRemainingValue = new JLabel(df.format(depositRemaining));
+		lblBalanceRemainingValue.setName("BAL_REM_SUB");
+		
+		lblTotalFinalValue = new JLabel(df.format(totalItemsCost));
 		lblTotalFinalValue.setName("TFV_SUB");
 		
-		lblAmntPaidFinalValue = new JLabel(Double.toString(amountPaid));
+		lblAmntPaidFinalValue = new JLabel(df.format(amountPaid));
 		lblAmntPaidFinalValue.setName("APFV_SUB");
 		
-		lblAmntDueFinalValue = new JLabel(Double.toString(amountDue));
+		lblAmntDueFinalValue = new JLabel(df.format(amountDue));
 		lblAmntDueFinalValue.setName("ADFV_SUB");
 
 
-				lblDrinkInvoiceValue.setBounds(100, 25, 100, 25);
-				lblSnackInvoiceValue.setBounds(100, 50, 100, 25);
-				lblEntreeInvoiceValue.setBounds(100, 75, 100, 25);
-				lblDessertInvoiceValue.setBounds(100, 100, 100, 25);
-				lblTaxInvoiceValue.setBounds(100, 125, 100, 25);
-				lblLaborValue.setBounds(100, 150, 100, 25);
-				lblTotalInvoiceValue.setBounds(100, 175, 100, 25);
-				lblBalanceDueValue.setBounds(100, 200, 100, 25);
+				lblDrinkInvoiceValue.setBounds(130, 25, 100, 25);
+				lblSnackInvoiceValue.setBounds(130, 50, 100, 25);
+				lblEntreeInvoiceValue.setBounds(130, 75, 100, 25);
+				lblDessertInvoiceValue.setBounds(130, 100, 100, 25);
+				lblTaxInvoiceValue.setBounds(130, 125, 100, 25);
+				lblLaborValue.setBounds(130, 150, 100, 25);
+				lblBalanceDueValue.setBounds(130, 175, 100, 25);
+				lblBalanceRemainingValue.setBounds(130, 200, 100, 25);
 				lblTotalFinalValue.setBounds(385,25,100,25);
 				lblAmntPaidFinalValue.setBounds(385,50,100,25);
 				lblAmntDueFinalValue.setBounds(385,75,100,25);
@@ -930,8 +948,8 @@ public class CommonMethods {
 				pnlInvoice.add(lblDessertInvoiceValue);
 				pnlInvoice.add(lblTaxInvoiceValue);
 				pnlInvoice.add(lblLaborValue);
-				pnlInvoice.add(lblTotalInvoiceValue);
 				pnlInvoice.add(lblBalanceDueValue);
+				pnlInvoice.add(lblBalanceRemainingValue);
 				pnlInvoice.add(lblTotalFinalValue);
 				pnlInvoice.add(lblAmntPaidFinalValue);
 				pnlInvoice.add(lblAmntDueFinalValue);
@@ -940,6 +958,10 @@ public class CommonMethods {
 		JButton btnDone = new JButton("ENTER");
 		btnDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				if(txtPayment.getText().equals("")){
+					System.out.println("not valid input");
+				}
 				
 				drinkSubtotal = Double.parseDouble(lblDrinkInvoiceValue.getText().trim());
 				snackSubtotal = Double.parseDouble(lblSnackInvoiceValue.getText().trim());
@@ -954,25 +976,19 @@ public class CommonMethods {
 				
 				calcAmountPaid();
 				calcAmountDue();
+				calcDepositRemaining();
 				
 				lblAmntPaidFinalValue.setText(calcAmountPaid());
 				lblAmntDueFinalValue.setText(calcAmountDue());
+				lblBalanceRemainingValue.setText(calcDepositRemaining());
 				
-				lblTaxInvoiceValue.setText(Double.toString(totalTaxSubtotal));
-				lblLaborValue.setText(Double.toString(totalLaborSubtotal));
-				lblTotalInvoiceValue.setText(Double.toString(totalItemsCost));
-				lblTotalFinalValue.setText(Double.toString(totalItemsCost));
-				lblBalanceDueValue.setText(Double.toString(depositAmount));
+				lblTaxInvoiceValue.setText(df.format(totalTaxSubtotal));
+				lblLaborValue.setText(df.format(totalLaborSubtotal));
+				lblTotalFinalValue.setText(df.format(totalItemsCost));
+				lblBalanceDueValue.setText(df.format(depositAmount));
 				
-				if(Double.parseDouble(lblAmntPaidFinalValue.getText().trim()) > 
-				Double.parseDouble(lblBalanceDueValue.getText().trim()))
-				{
-					JLabel lblDepositPaid = new JLabel("DEPOSIT PAID!");
-					lblDepositPaid.setBounds(290,160,125,25);
-					lblDepositPaid.setForeground(green);
-					pnlInvoice.add(lblDepositPaid);
-				}
-
+				txtPayment.setText("0.00");
+				
 				pnlInvoice.repaint();
 
 			}
@@ -980,6 +996,17 @@ public class CommonMethods {
 		btnDone.setBounds(405, 212, 80, 23);
 		pnlInvoice.add(btnDone);
 
+		if(lblBalanceRemainingValue.getText().trim().equals("0.00"))
+		{
+			JLabel lblDepositPaid = new JLabel("DEPOSIT PAID!");
+			lblDepositPaid.setBounds(180,200,125,25);
+			lblDepositPaid.setForeground(red);
+			pnlInvoice.add(lblDepositPaid);
+		}
+
+		if(!lblBalanceRemainingValue.getText().trim().equals("0.00"))	
+			lblBalanceRemainingHeader.setBackground(red);
+		
 		return pnlInvoice;
 		
 	}//end makePnlInvoice method
@@ -1120,7 +1147,7 @@ public class CommonMethods {
 		// create header label for user data
 		JLabel drinkQntyLbl = new JLabel("Enter Qnty");
 		drinkQntyLbl.setBounds(335, 5, 60, 17);
-		drinkQntyLbl.setForeground(c);
+		drinkQntyLbl.setForeground(red);
 		pnlDrinksOrder.add(drinkQntyLbl);
 
 		// position input fields
@@ -1162,7 +1189,7 @@ public class CommonMethods {
 		pnlDrinksOrder.add(dSubLbl);
 
 		// display drink subtotal cost
-		dSubtotal = new JLabel(Double.toString(drinkSubtotal));
+		dSubtotal = new JLabel(df.format(drinkSubtotal));
 		dSubtotal.setBounds(35, 214, 120, 23);
 		dSubtotal.setName("DR_SUB");
 		pnlDrinksOrder.add(dSubtotal);
@@ -1199,15 +1226,16 @@ public class CommonMethods {
 					calcDepositAmount();
 					calcAmountPaid();
 					calcAmountDue();
+					calcDepositRemaining();
 					
 					lblAmntDueFinalValue.setText(calcAmountDue());
-					dSubtotal.setText(Double.toString(drinkSubtotal));
-					lblDrinkInvoiceValue.setText(Double.toString(drinkSubtotal));
-					lblTaxInvoiceValue.setText(Double.toString(totalTaxSubtotal));
-					lblLaborValue.setText(Double.toString(totalLaborSubtotal));
-					lblTotalInvoiceValue.setText(Double.toString(totalItemsCost));
-					lblTotalFinalValue.setText(Double.toString(totalItemsCost));
-					lblBalanceDueValue.setText(Double.toString(depositAmount));
+					dSubtotal.setText(df.format(drinkSubtotal));
+					lblDrinkInvoiceValue.setText(df.format(drinkSubtotal));
+					lblTaxInvoiceValue.setText(df.format(totalTaxSubtotal));
+					lblLaborValue.setText(df.format(totalLaborSubtotal));
+					lblTotalFinalValue.setText(df.format(totalItemsCost));
+					lblBalanceDueValue.setText(df.format(depositAmount));
+					lblBalanceRemainingValue.setText(df.format(depositRemaining));
 					
 					pnlDrinksOrder.repaint();
 				}
@@ -1248,7 +1276,7 @@ public class CommonMethods {
 		// create header label for user data
 		JLabel snackQntyLbl = new JLabel("Enter Qnty");
 		snackQntyLbl.setBounds(335, 5, 60, 17);
-		snackQntyLbl.setForeground(c);
+		snackQntyLbl.setForeground(red);
 		pnlSnacksOrder.add(snackQntyLbl);
 
 		// position input fields
@@ -1291,7 +1319,7 @@ public class CommonMethods {
 
 		// display snack subtotal cost
 
-		sSubtotal = new JLabel(Double.toString(snackSubtotal));
+		sSubtotal = new JLabel(df.format(snackSubtotal));
 		sSubtotal.setBounds(35, 214, 120, 23);
 		sSubtotal.setName("SN_SUB");
 		pnlSnacksOrder.add(sSubtotal);
@@ -1326,15 +1354,16 @@ public class CommonMethods {
 					calcDepositAmount();
 					calcAmountPaid();
 					calcAmountDue();
+					calcDepositRemaining();
 				
 					lblAmntDueFinalValue.setText(calcAmountDue());
-					sSubtotal.setText(Double.toString(snackSubtotal));
-					lblSnackInvoiceValue.setText(Double.toString(snackSubtotal));
-					lblTaxInvoiceValue.setText(Double.toString(totalTaxSubtotal));
-					lblLaborValue.setText(Double.toString(totalLaborSubtotal));
-					lblTotalInvoiceValue.setText(Double.toString(totalItemsCost));
-					lblTotalFinalValue.setText(Double.toString(totalItemsCost));
-					lblBalanceDueValue.setText(Double.toString(depositAmount));
+					sSubtotal.setText(df.format(snackSubtotal));
+					lblSnackInvoiceValue.setText(df.format(snackSubtotal));
+					lblTaxInvoiceValue.setText(df.format(totalTaxSubtotal));
+					lblLaborValue.setText(df.format(totalLaborSubtotal));
+					lblTotalFinalValue.setText(df.format(totalItemsCost));
+					lblBalanceDueValue.setText(df.format(depositAmount));
+					lblBalanceRemainingValue.setText(df.format(depositRemaining));
 
 
 					pnlSnacksOrder.repaint();
@@ -1374,7 +1403,7 @@ public class CommonMethods {
 		// create header label for user data
 		JLabel entreeQntyLbl = new JLabel("Enter Qnty");
 		entreeQntyLbl.setBounds(335, 5, 60, 17);
-		entreeQntyLbl.setForeground(c);
+		entreeQntyLbl.setForeground(red);
 		pnlEntreesOrder.add(entreeQntyLbl);
 
 		// position input fields
@@ -1416,7 +1445,7 @@ public class CommonMethods {
 		pnlEntreesOrder.add(eSubLbl);
 
 		// display entree subtotal cost
-		eSubtotal = new JLabel(Double.toString(entreeSubtotal));
+		eSubtotal = new JLabel(df.format(entreeSubtotal));
 		eSubtotal.setBounds(35, 214, 120, 23);
 		eSubtotal.setName("EN_SUB");
 		pnlEntreesOrder.add(eSubtotal);
@@ -1451,15 +1480,16 @@ public class CommonMethods {
 					calcDepositAmount();
 					calcAmountPaid();
 					calcAmountDue();
+					calcDepositRemaining();
 					
 					lblAmntDueFinalValue.setText(calcAmountDue());
-					eSubtotal.setText(Double.toString(entreeSubtotal));
-					lblEntreeInvoiceValue.setText(Double.toString(entreeSubtotal));
-					lblTaxInvoiceValue.setText(Double.toString(totalTaxSubtotal));
-					lblLaborValue.setText(Double.toString(totalLaborSubtotal));
-					lblTotalInvoiceValue.setText(Double.toString(totalItemsCost));
-					lblTotalFinalValue.setText(Double.toString(totalItemsCost));
-					lblBalanceDueValue.setText(Double.toString(depositAmount));
+					eSubtotal.setText(df.format(entreeSubtotal));
+					lblEntreeInvoiceValue.setText(df.format(entreeSubtotal));
+					lblTaxInvoiceValue.setText(df.format(totalTaxSubtotal));
+					lblLaborValue.setText(df.format(totalLaborSubtotal));
+					lblTotalFinalValue.setText(df.format(totalItemsCost));
+					lblBalanceDueValue.setText(df.format(depositAmount));
+					lblBalanceRemainingValue.setText(df.format(depositRemaining));
 
 
 					pnlEntreesOrder.repaint();
@@ -1500,7 +1530,7 @@ public class CommonMethods {
 		// create header label for user data
 		JLabel dessertQntyLbl = new JLabel("Enter Qnty");
 		dessertQntyLbl.setBounds(335, 5, 60, 17);
-		dessertQntyLbl.setForeground(c);
+		dessertQntyLbl.setForeground(red);
 		pnlDessertsOrder.add(dessertQntyLbl);
 
 		// position input fields
@@ -1545,7 +1575,7 @@ public class CommonMethods {
 		pnlDessertsOrder.add(dSubLbl);
 
 		// display desserts subtotal cost
-		deSubtotal = new JLabel(Double.toString(dessertSubtotal));
+		deSubtotal = new JLabel(df.format(dessertSubtotal));
 		deSubtotal.setBounds(35, 214, 120, 23);
 		deSubtotal.setName("DE_SUB");
 		pnlDessertsOrder.add(deSubtotal);
@@ -1581,15 +1611,16 @@ public class CommonMethods {
 					calcDepositAmount();
 					calcAmountPaid();
 					calcAmountDue();
+					calcDepositRemaining();
 					
 					lblAmntDueFinalValue.setText(calcAmountDue());
-					deSubtotal.setText(Double.toString(dessertSubtotal));
-					lblDessertInvoiceValue.setText(Double.toString(dessertSubtotal));
-					lblTaxInvoiceValue.setText(Double.toString(totalTaxSubtotal));
-					lblLaborValue.setText(Double.toString(totalLaborSubtotal));
-					lblTotalInvoiceValue.setText(Double.toString(totalItemsCost));
-					lblTotalFinalValue.setText(Double.toString(totalItemsCost));
-					lblBalanceDueValue.setText(Double.toString(depositAmount));
+					deSubtotal.setText(df.format(dessertSubtotal));
+					lblDessertInvoiceValue.setText(df.format(dessertSubtotal));
+					lblTaxInvoiceValue.setText(df.format(totalTaxSubtotal));
+					lblLaborValue.setText(df.format(totalLaborSubtotal));
+					lblTotalFinalValue.setText(df.format(totalItemsCost));
+					lblBalanceDueValue.setText(df.format(depositAmount));
+					lblBalanceRemainingValue.setText(df.format(depositRemaining));
 
 
 					pnlDessertsOrder.repaint();
@@ -2395,15 +2426,15 @@ public class CommonMethods {
 		totalLaborSubtotal.appendChild(doc.createTextNode(lblLaborValue.getText().trim()));
 		event.appendChild(totalLaborSubtotal);
 		
-		//total items element
-		Element totalItemsCost = doc.createElement("TOT_SUB");
-		totalItemsCost.appendChild(doc.createTextNode(lblTotalInvoiceValue.getText().trim()));
-		event.appendChild(totalItemsCost);
-		
 		//Balance element
 		Element balanceDue = doc.createElement("BAL_SUB");
 		balanceDue.appendChild(doc.createTextNode(lblBalanceDueValue.getText().trim()));
 		event.appendChild(balanceDue);
+		
+		//Balance Remaining element
+		Element depRemain = doc.createElement("BAL_REM_SUB");
+		depRemain.appendChild(doc.createTextNode(lblBalanceRemainingValue.getText().trim()));
+		event.appendChild(depRemain);
 		
 		//Total element
 		Element totalFinalValue = doc.createElement("TFV_SUB");
@@ -2840,14 +2871,14 @@ public class CommonMethods {
 								node.setTextContent(lblLaborValue.getText().trim());
 							}
 							
-							// get the TOT_SUB element, and update the value
-							if (node.getNodeName().equals("TOT_SUB")) {
-								node.setTextContent(lblTotalInvoiceValue.getText().trim());
-							}
-							
 							// get the BAL_SUB element, and update the value
 							if (node.getNodeName().equals("BAL_SUB")) {
 								node.setTextContent(lblBalanceDueValue.getText().trim());
+							}
+							
+							// get the BAL_REM_SUB element, and update the value
+							if (node.getNodeName().equals("BAL_REM_SUB")) {
+								node.setTextContent(lblBalanceRemainingValue.getText().trim());
 							}
 							
 							// get the TFV_SUB element, and update the value
