@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,8 +51,12 @@ import org.xml.sax.SAXException;
 
 public class CommonMethods {
 
-	Color c = new Color(255, 0, 0);
+	Color red = new Color(255, 0, 0);
+	Color blue = new Color(59,89,152);
+	Color pink = new Color(248, 17, 159);
 
+	DecimalFormat df = new DecimalFormat("0.00");
+	
 	JPanel pnlEvent, pnlClient, pnlOrder, pnlInvoice;
 
 	// txt fields for client info
@@ -99,7 +104,9 @@ public class CommonMethods {
 	JTextField txtDessert7 = new JTextField("0");
 	JTextField txtDessert8 = new JTextField("0");
 	JTextField txtDessert9 = new JTextField("0");
-
+	
+	JTextField txtPayment;
+	
 	JTextArea txtNotes;
 	JRadioButton rdbtnOurBanquet, rdbtnOther;
 	ButtonGroup rdbtnGroupVenue;
@@ -109,6 +116,26 @@ public class CommonMethods {
 	// tabs for order info
 	JTabbedPane tabpnlAdd2;
 
+	//labels for the Invoice tab
+	JLabel lblDrinkInvoiceValue;
+	JLabel lblSnackInvoiceValue; 
+	JLabel lblEntreeInvoiceValue;	
+	JLabel lblDessertInvoiceValue; 
+	JLabel lblTaxInvoiceValue; 	
+	JLabel lblLaborValue; 		
+	JLabel lblBalanceDueValue;
+	JLabel lblBalanceRemainingValue;
+	JLabel lblTotalFinalValue; 	
+	JLabel lblAmntPaidFinalValue; 
+	JLabel lblAmntDueFinalValue;
+	
+	//labels for the subtotals on the Order forms
+	JLabel dSubtotal;
+	JLabel sSubtotal;
+	JLabel eSubtotal;
+	JLabel deSubtotal;
+	
+	
 	// Hash Maps used for storing event-specific information
 	HashMap<String, String> hmClientTab = new HashMap<String, String>(); // HashMap
 																			// object
@@ -242,7 +269,8 @@ public class CommonMethods {
 
 	// ////CALCULATION VARIABLES and METHODS///////////////////
 	final double SALES_TAX = 0.07;
-	final double LABOR_RATE = 30;
+	//LABOR RATE is fraction of total food costs
+	final double LABOR_RATE = 0.30;
 
 	// users Order input will be stored in an array for purpose of calcs
 	int[] drinkQnty = new int[9];
@@ -261,56 +289,122 @@ public class CommonMethods {
 	double totalItemsCost = 0;
 	double totalLaborHrs = 0;
 
+	double depositAmount = 0;
+	double depositRemaining = 0;
 	double amountPaid = 0;
 	double amountDue = 0;
 
-	JTextField txtAmountPaid;
+	
 
 	// Calculation methods
-	void calcDrinkSubtotal() {
+	String calcDrinkSubtotal() {
+		drinkSubtotal = 0;
 		for (int i = 0; i < drinkQnty.length; i++) {
 			drinkSubtotal = drinkSubtotal
 					+ (drinkQnty[i] * (double) drinkArray[i][2]);
 		}
+		return df.format(drinkSubtotal);
 	}
 
-	void calcSnacksSubtotal() {
+	String calcSnacksSubtotal() {
+		snackSubtotal = 0;
 		for (int i = 0; i < snackQnty.length; i++) {
 			snackSubtotal = snackSubtotal
 					+ (snackQnty[i] * (double) snackArray[i][2]);
 		}
+		return df.format(snackSubtotal);
 	}
 
-	void calcEntreeSubtotal() {
+	String calcEntreeSubtotal() {
+		entreeSubtotal = 0;
 		for (int i = 0; i < entreeQnty.length; i++) {
 			entreeSubtotal = entreeSubtotal
 					+ (entreeQnty[i] * (double) entreeArray[i][2]);
 		}
+		return df.format(entreeSubtotal);
 	}
 
-	void calcDessertSubtotal() {
+	String calcDessertSubtotal() {
+		dessertSubtotal = 0;
 		for (int i = 0; i < dessertQnty.length; i++) {
 			dessertSubtotal = dessertSubtotal
 					+ (dessertQnty[i] * (double) dessertArray[i][2]);
 		}
+		return df.format(dessertSubtotal);
 	}
 
-	void calcTotalFoodSubtotal() {
+	String calcTotalFoodSubtotal() {
 		totalFoodSubtotal = drinkSubtotal + snackSubtotal + entreeSubtotal
 				+ dessertSubtotal;
+		
+		return df.format(totalFoodSubtotal);
 	}
 
-	void calcTotalTaxSubtotal() {
-		totalTaxSubtotal = totalFoodSubtotal * SALES_TAX;
+	String calcTotalTaxSubtotal() {
+		totalTaxSubtotal = Double.parseDouble(calcTotalFoodSubtotal()) * SALES_TAX;
+		
+		return df.format(totalTaxSubtotal);
 	}
 
-	void calcTotalLaborSubtotal() {
-		totalLaborSubtotal = totalLaborHrs * LABOR_RATE;
+	String calcTotalLaborSubtotal() {
+		totalLaborSubtotal = totalFoodSubtotal * LABOR_RATE;
+		
+		return df.format(totalLaborSubtotal);
 	}
 
-	void calcTotalItemsCost() {
+	String calcTotalItemsCost() {
 		totalItemsCost = totalFoodSubtotal + totalTaxSubtotal
 				+ totalLaborSubtotal;
+		
+		return df.format(totalItemsCost);
+	}
+	
+	String calcDepositAmount() {
+		
+		if ((totalItemsCost * 0.5) < 500 && totalItemsCost > 500) {
+			depositAmount = 500;
+		} else if ((totalItemsCost * 0.5) < 500 && totalItemsCost < 500) {
+			depositAmount = totalItemsCost;
+		}
+
+		else {
+			depositAmount = totalItemsCost * 0.5;
+		}
+
+		return df.format(depositAmount);
+	}
+	
+	
+	String calcAmountPaid(){
+		
+		if(txtPayment.getText().equals("")){
+			txtPayment.setText("0");
+		}
+		
+		amountPaid = (Double.parseDouble(lblAmntPaidFinalValue.getText()));
+		amountPaid += Double.parseDouble(txtPayment.getText());
+		return df.format(amountPaid);
+	}
+	
+	String calcDepositRemaining(){
+		
+		double diff = depositAmount - amountPaid;
+		if(diff < 0)
+			depositRemaining=0;
+		else
+			depositRemaining = diff;
+		return df.format(depositRemaining);
+		
+	}
+	
+	String calcAmountDue(){
+		
+		amountDue = totalItemsCost - amountPaid;
+		return df.format(amountDue);
+	}
+	
+	void setAmountPaid(double amount) {
+		amountPaid = amount;
 	}
 
 	// Methods to clear variables
@@ -734,114 +828,119 @@ public class CommonMethods {
 	}
 
 	private Component makePnlInvoice() {
+	
 		// create a panel object and set its layout to null(absolute)
-		final JPanel pnlInvoice = new JPanel();
+		pnlInvoice = new JPanel();
 		pnlInvoice.setLayout(null);
 
-		JLabel lblAmntPaid = new JLabel("Amount Paid ($)");
-		lblAmntPaid.setBounds(175, 175, 100, 25);
-		pnlInvoice.add(lblAmntPaid);
+		JLabel lblDepositHeader = new JLabel("DEPOSIT INVOICE");
+		lblDepositHeader.setBounds(1, 1, 100, 25);
+		lblDepositHeader.setForeground(blue);
+		pnlInvoice.add(lblDepositHeader);
+		
+		JLabel lblBalanceInvoiceHeader = new JLabel("BALANCE INVOICE");
+		lblBalanceInvoiceHeader.setBounds(285, 1, 125, 25);
+		lblBalanceInvoiceHeader.setForeground(blue);
+		pnlInvoice.add(lblBalanceInvoiceHeader);
+		
+		JLabel lblPayment = new JLabel("Payment ($)");
+		lblPayment.setBounds(290, 182, 100, 25);
+		pnlInvoice.add(lblPayment);
 
-		txtAmountPaid = new JTextField("0");
-		txtAmountPaid.setBounds(175, 205, 100, 25);
-		pnlInvoice.add(txtAmountPaid);
-
-		JLabel lblInvoiceWarning = new JLabel("Refresh After Order Changes!");
-		lblInvoiceWarning.setBounds(1, 20, 170, 23);
-		lblInvoiceWarning.setForeground(c);
-		pnlInvoice.add(lblInvoiceWarning);
+		txtPayment = new JTextField("0");
+		txtPayment.setBounds(290, 210, 100, 25);
+		pnlInvoice.add(txtPayment);
 
 		JLabel lblDrinkInvoiceHeader = new JLabel("Drinks:  ");
-		lblDrinkInvoiceHeader.setBounds(1, 40, 100, 25);
+		lblDrinkInvoiceHeader.setBounds(1, 25, 100, 25);
 		pnlInvoice.add(lblDrinkInvoiceHeader);
 
 		JLabel lblSnackInvoiceHeader = new JLabel("Snacks:  ");
-		lblSnackInvoiceHeader.setBounds(1, 65, 100, 25);
+		lblSnackInvoiceHeader.setBounds(1, 50, 100, 25);
 		pnlInvoice.add(lblSnackInvoiceHeader);
 
 		JLabel lblEntreeInvoiceHeader = new JLabel("Entrees:  ");
-		lblEntreeInvoiceHeader.setBounds(1, 90, 100, 25);
+		lblEntreeInvoiceHeader.setBounds(1, 75, 100, 25);
 		pnlInvoice.add(lblEntreeInvoiceHeader);
 
 		JLabel lblDessertInvoiceHeader = new JLabel("Desserts:  ");
-		lblDessertInvoiceHeader.setBounds(1, 115, 100, 25);
+		lblDessertInvoiceHeader.setBounds(1, 100, 100, 25);
 		pnlInvoice.add(lblDessertInvoiceHeader);
 
 		JLabel lblTaxInvoiceHeader = new JLabel("Sales Tax (" + SALES_TAX
 				+ "):  ");
-		lblTaxInvoiceHeader.setBounds(1, 140, 100, 25);
+		lblTaxInvoiceHeader.setBounds(1, 125, 100, 25);
 		pnlInvoice.add(lblTaxInvoiceHeader);
 
 		JLabel lblLaborHeader = new JLabel("Labor:  ");
-		lblLaborHeader.setBounds(1, 165, 100, 25);
+		lblLaborHeader.setBounds(1, 150, 100, 25);
 		pnlInvoice.add(lblLaborHeader);
 
-		JLabel lblTotalInvoiceHeader = new JLabel("Total:  ");
-		lblTotalInvoiceHeader.setBounds(1, 190, 100, 25);
-		pnlInvoice.add(lblTotalInvoiceHeader);
-
-		JLabel lblBalanceDueHeader = new JLabel("Amount Due:  ");
-		lblBalanceDueHeader.setBounds(1, 215, 100, 25);
+		JLabel lblBalanceDueHeader = new JLabel("Total Deposit Due:  ");
+		lblBalanceDueHeader.setBounds(1, 175, 150, 25);
 		pnlInvoice.add(lblBalanceDueHeader);
+		
+		JLabel lblBalanceRemainingHeader = new JLabel("Deposit Balance Due:  ");
+		lblBalanceRemainingHeader.setBounds(1, 200, 150, 25);
+		pnlInvoice.add(lblBalanceRemainingHeader);
 
 		JLabel lblTotalFinal = new JLabel("Total:  ");
-		lblTotalFinal.setBounds(175, 25, 100, 25);
+		lblTotalFinal.setBounds(285, 25, 100, 25);
 		pnlInvoice.add(lblTotalFinal);
 
 		JLabel lblAmntPaidFinal = new JLabel("Amount Paid:  ");
-		lblAmntPaidFinal.setBounds(175, 50, 100, 25);
+		lblAmntPaidFinal.setBounds(285, 50, 100, 25);
 		pnlInvoice.add(lblAmntPaidFinal);
 
 		JLabel lblAmntDueFinal = new JLabel("Amount Due:  ");
-		lblAmntDueFinal.setBounds(175, 75, 100, 25);
+		lblAmntDueFinal.setBounds(285, 75, 100, 25);
 		pnlInvoice.add(lblAmntDueFinal);
 
-		final JLabel lblDrinkInvoiceValue = new JLabel(
-				Double.toString(drinkSubtotal));
-		final JLabel lblSnackInvoiceValue = new JLabel(
-				Double.toString(snackSubtotal));
-		final JLabel lblEntreeInvoiceValue = new JLabel(
-				Double.toString(entreeSubtotal));
-		final JLabel lblDessertInvoiceValue = new JLabel(
-				Double.toString(dessertSubtotal));
-		final JLabel lblTaxInvoiceValue = new JLabel(
-				Double.toString(totalTaxSubtotal));
-		final JLabel lblLaborValue = new JLabel(
-				Double.toString(totalLaborSubtotal));
-		final JLabel lblTotalInvoiceValue = new JLabel(
-				Double.toString(totalItemsCost));
-		final JLabel lblBalanceDueValue = new JLabel(
-				Double.toString(totalItemsCost * .5));
-		final JLabel lblTotalFinalValue = new JLabel(
-				Double.toString(totalItemsCost));
-		final JLabel lblAmntPaidFinalValue = new JLabel(
-				Double.toString(amountPaid));
-		final JLabel lblAmntDueFinalValue = new JLabel(
-				Double.toString(amountDue));
+		lblDrinkInvoiceValue = new JLabel(df.format(drinkSubtotal));
+		lblDrinkInvoiceValue.setName("DR_SUB_INV");
+		
+		lblSnackInvoiceValue = new JLabel(df.format(snackSubtotal));
+		lblSnackInvoiceValue.setName("SN_SUB_INV");
+		
+		lblEntreeInvoiceValue = new JLabel(df.format(entreeSubtotal));
+		lblEntreeInvoiceValue.setName("EN_SUB_INV");
+		
+		lblDessertInvoiceValue = new JLabel(df.format(dessertSubtotal));
+		lblDessertInvoiceValue.setName("DE_SUB_INV");
+		
+		lblTaxInvoiceValue = new JLabel(df.format(totalTaxSubtotal));
+		lblTaxInvoiceValue.setName("TXV_SUB");
+		
+		lblLaborValue = new JLabel(df.format(totalLaborSubtotal));
+		lblLaborValue.setName("LV_SUB");
+		
+		lblBalanceDueValue = new JLabel(df.format(totalItemsCost * .5));
+		lblBalanceDueValue.setName("BAL_SUB");
+		
+		lblBalanceRemainingValue = new JLabel(df.format(depositRemaining));
+		lblBalanceRemainingValue.setName("BAL_REM_SUB");
+		
+		lblTotalFinalValue = new JLabel(df.format(totalItemsCost));
+		lblTotalFinalValue.setName("TFV_SUB");
+		
+		lblAmntPaidFinalValue = new JLabel(df.format(amountPaid));
+		lblAmntPaidFinalValue.setName("APFV_SUB");
+		
+		lblAmntDueFinalValue = new JLabel(df.format(amountDue));
+		lblAmntDueFinalValue.setName("ADFV_SUB");
 
-		JButton btnDeposit = new JButton("Deposit Invoice");
-		btnDeposit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
 
-				clearAllCosts();
-
-				calcDrinkSubtotal();
-				calcSnacksSubtotal();
-				calcEntreeSubtotal();
-				calcDessertSubtotal();
-				calcTotalFoodSubtotal();
-				calcTotalTaxSubtotal();
-				calcTotalLaborSubtotal();
-				calcTotalItemsCost();
-
-				lblDrinkInvoiceValue.setBounds(100, 40, 100, 25);
-				lblSnackInvoiceValue.setBounds(100, 65, 100, 25);
-				lblEntreeInvoiceValue.setBounds(100, 90, 100, 25);
-				lblDessertInvoiceValue.setBounds(100, 115, 100, 25);
-				lblTaxInvoiceValue.setBounds(100, 140, 100, 25);
-				lblLaborValue.setBounds(100, 165, 100, 25);
-				lblTotalInvoiceValue.setBounds(100, 190, 100, 25);
-				lblBalanceDueValue.setBounds(100, 215, 100, 25);
+				lblDrinkInvoiceValue.setBounds(130, 25, 100, 25);
+				lblSnackInvoiceValue.setBounds(130, 50, 100, 25);
+				lblEntreeInvoiceValue.setBounds(130, 75, 100, 25);
+				lblDessertInvoiceValue.setBounds(130, 100, 100, 25);
+				lblTaxInvoiceValue.setBounds(130, 125, 100, 25);
+				lblLaborValue.setBounds(130, 150, 100, 25);
+				lblBalanceDueValue.setBounds(130, 175, 100, 25);
+				lblBalanceRemainingValue.setBounds(130, 200, 100, 25);
+				lblTotalFinalValue.setBounds(385,25,100,25);
+				lblAmntPaidFinalValue.setBounds(385,50,100,25);
+				lblAmntDueFinalValue.setBounds(385,75,100,25);
 
 				pnlInvoice.add(lblDrinkInvoiceValue);
 				pnlInvoice.add(lblSnackInvoiceValue);
@@ -849,85 +948,47 @@ public class CommonMethods {
 				pnlInvoice.add(lblDessertInvoiceValue);
 				pnlInvoice.add(lblTaxInvoiceValue);
 				pnlInvoice.add(lblLaborValue);
-				pnlInvoice.add(lblTotalInvoiceValue);
 				pnlInvoice.add(lblBalanceDueValue);
-
-				lblDrinkInvoiceValue.setText("$ "
-						+ Double.toString(drinkSubtotal));
-				lblSnackInvoiceValue.setText("$ "
-						+ Double.toString(snackSubtotal));
-				lblEntreeInvoiceValue.setText("$ "
-						+ Double.toString(entreeSubtotal));
-				lblDessertInvoiceValue.setText("$ "
-						+ Double.toString(dessertSubtotal));
-				lblTaxInvoiceValue.setText("$ "
-						+ Double.toString(totalTaxSubtotal));
-				lblLaborValue.setText("$ "
-						+ Double.toString(totalLaborSubtotal));
-				lblTotalInvoiceValue.setText("$ "
-						+ Double.toString(totalItemsCost));
-
-				if ((totalItemsCost * 0.5) < 500 && totalItemsCost > 500) {
-					lblBalanceDueValue.setText("$ 500.00");
-				} else if ((totalItemsCost * 0.5) < 500 && totalItemsCost < 500) {
-					lblBalanceDueValue.setText("$ "
-							+ Double.toString(totalItemsCost));
-				}
-
-				else {
-					lblBalanceDueValue.setText("$ "
-							+ Double.toString(totalItemsCost * 0.5));
-				}
-
-				pnlInvoice.repaint();
-
-			}
-		});
-
-		btnDeposit.setBounds(1, 1, 125, 23);
-		pnlInvoice.add(btnDeposit);
-
-		JButton btnFinal = new JButton("Final Invoice");
-		btnDeposit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-
-				lblTotalFinalValue.setBounds(275, 25, 100, 25);
-				lblAmntPaidFinalValue.setBounds(275, 50, 100, 25);
-				lblAmntDueFinalValue.setBounds(275, 75, 100, 25);
-
+				pnlInvoice.add(lblBalanceRemainingValue);
 				pnlInvoice.add(lblTotalFinalValue);
 				pnlInvoice.add(lblAmntPaidFinalValue);
 				pnlInvoice.add(lblAmntDueFinalValue);
 
-				lblTotalFinalValue.setText("$ "
-						+ Double.toString(totalItemsCost));
-				lblAmntPaidFinalValue.setText("$ "
-						+ Double.toString(amountPaid));
-				lblAmntDueFinalValue.setText("$ " + Double.toString(amountDue));
 
-				pnlInvoice.repaint();
-
-			}
-		});
-		btnFinal.setBounds(175, 1, 125, 23);
-		pnlInvoice.add(btnFinal);
-
-		JButton btnDone = new JButton("DONE");
+		JButton btnDone = new JButton("ENTER");
 		btnDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// ArrayList<HashMap<String,String>> tempList = Add();
-				// CommonMethods.hmEvents.put(((HashMap<String,
-				// String>)tempList.get(1)).get("EVNAME"), tempList);
-				amountPaid = Double.parseDouble(txtAmountPaid.getText());
-				amountDue = totalItemsCost - amountPaid;
-
-				lblTotalFinalValue.setText("$ "
-						+ Double.toString(totalItemsCost));
-				lblAmntPaidFinalValue.setText("$ "
-						+ Double.toString(amountPaid));
-				lblAmntDueFinalValue.setText("$ " + Double.toString(amountDue));
-				clearSnackSubtotal();
-
+				
+				if(txtPayment.getText().equals("")){
+					System.out.println("not valid input");
+				}
+				
+				drinkSubtotal = Double.parseDouble(lblDrinkInvoiceValue.getText().trim());
+				snackSubtotal = Double.parseDouble(lblSnackInvoiceValue.getText().trim());
+				entreeSubtotal = Double.parseDouble(lblEntreeInvoiceValue.getText().trim());
+				dessertSubtotal = Double.parseDouble(lblDessertInvoiceValue.getText().trim());
+				
+				calcTotalFoodSubtotal();
+				calcTotalTaxSubtotal();
+				calcTotalLaborSubtotal();
+				calcTotalItemsCost();
+				calcDepositAmount();
+				
+				calcAmountPaid();
+				calcAmountDue();
+				calcDepositRemaining();
+				
+				lblAmntPaidFinalValue.setText(calcAmountPaid());
+				lblAmntDueFinalValue.setText(calcAmountDue());
+				lblBalanceRemainingValue.setText(calcDepositRemaining());
+				
+				lblTaxInvoiceValue.setText(df.format(totalTaxSubtotal));
+				lblLaborValue.setText(df.format(totalLaborSubtotal));
+				lblTotalFinalValue.setText(df.format(totalItemsCost));
+				lblBalanceDueValue.setText(df.format(depositAmount));
+				
+				txtPayment.setText("0.00");
+				
 				pnlInvoice.repaint();
 
 			}
@@ -935,8 +996,20 @@ public class CommonMethods {
 		btnDone.setBounds(405, 212, 80, 23);
 		pnlInvoice.add(btnDone);
 
+		if(lblBalanceRemainingValue.getText().trim().equals("0.00"))
+		{
+			JLabel lblDepositPaid = new JLabel("DEPOSIT PAID!");
+			lblDepositPaid.setBounds(180,200,125,25);
+			lblDepositPaid.setForeground(red);
+			pnlInvoice.add(lblDepositPaid);
+		}
+
+		if(!lblBalanceRemainingValue.getText().trim().equals("0.00"))	
+			lblBalanceRemainingHeader.setBackground(red);
+		
 		return pnlInvoice;
-	}
+		
+	}//end makePnlInvoice method
 
 	// Making the Menu Display Tabs
 	// Drinks
@@ -1074,7 +1147,7 @@ public class CommonMethods {
 		// create header label for user data
 		JLabel drinkQntyLbl = new JLabel("Enter Qnty");
 		drinkQntyLbl.setBounds(335, 5, 60, 17);
-		drinkQntyLbl.setForeground(c);
+		drinkQntyLbl.setForeground(red);
 		pnlDrinksOrder.add(drinkQntyLbl);
 
 		// position input fields
@@ -1087,7 +1160,18 @@ public class CommonMethods {
 		txtDrink6.setBounds(342, 120, 40, 17);
 		txtDrink7.setBounds(342, 136, 40, 17);
 		txtDrink8.setBounds(342, 152, 40, 17);
-
+		
+		// name input fields
+		txtDrink0.setName("DRINK0");
+		txtDrink1.setName("DRINK1");
+		txtDrink2.setName("DRINK2");
+		txtDrink3.setName("DRINK3");
+		txtDrink4.setName("DRINK4");
+		txtDrink5.setName("DRINK5");
+		txtDrink6.setName("DRINK6");
+		txtDrink7.setName("DRINK7");
+		txtDrink8.setName("DRINK8");
+		
 		// add fields to panel
 		pnlDrinksOrder.add(txtDrink0);
 		pnlDrinksOrder.add(txtDrink1);
@@ -1099,19 +1183,17 @@ public class CommonMethods {
 		pnlDrinksOrder.add(txtDrink7);
 		pnlDrinksOrder.add(txtDrink8);
 
-		// Stephen: Set names of all text boxes for all Drinks, Snacks, Entrees,
-		// and Desserts
-
 		// label for drink subtotal cost
 		JLabel dSubLbl = new JLabel("Drinks Subtotal");
 		dSubLbl.setBounds(35, 198, 120, 23);
 		pnlDrinksOrder.add(dSubLbl);
 
 		// display drink subtotal cost
-		final JLabel dSubtotal = new JLabel("$ "
-				+ Double.toString(drinkSubtotal));
+		dSubtotal = new JLabel(df.format(drinkSubtotal));
 		dSubtotal.setBounds(35, 214, 120, 23);
+		dSubtotal.setName("DR_SUB");
 		pnlDrinksOrder.add(dSubtotal);
+		
 
 		// add SAVE button
 		JButton btnDone = new JButton("DONE");
@@ -1130,10 +1212,31 @@ public class CommonMethods {
 					drinkQnty[7] = Integer.parseInt(txtDrink7.getText());
 					drinkQnty[8] = Integer.parseInt(txtDrink8.getText());
 
+					drinkSubtotal = Double.parseDouble(lblDrinkInvoiceValue.getText().trim());
+					snackSubtotal = Double.parseDouble(lblSnackInvoiceValue.getText().trim());
+					entreeSubtotal = Double.parseDouble(lblEntreeInvoiceValue.getText().trim());
+					dessertSubtotal = Double.parseDouble(lblDessertInvoiceValue.getText().trim());
+					
 					clearDrinkSubtotal();
 					calcDrinkSubtotal();
-					dSubtotal.setText("$ " + Double.toString(drinkSubtotal));
-
+					calcTotalFoodSubtotal();
+					calcTotalTaxSubtotal();
+					calcTotalLaborSubtotal();
+					calcTotalItemsCost();
+					calcDepositAmount();
+					calcAmountPaid();
+					calcAmountDue();
+					calcDepositRemaining();
+					
+					lblAmntDueFinalValue.setText(calcAmountDue());
+					dSubtotal.setText(df.format(drinkSubtotal));
+					lblDrinkInvoiceValue.setText(df.format(drinkSubtotal));
+					lblTaxInvoiceValue.setText(df.format(totalTaxSubtotal));
+					lblLaborValue.setText(df.format(totalLaborSubtotal));
+					lblTotalFinalValue.setText(df.format(totalItemsCost));
+					lblBalanceDueValue.setText(df.format(depositAmount));
+					lblBalanceRemainingValue.setText(df.format(depositRemaining));
+					
 					pnlDrinksOrder.repaint();
 				}
 
@@ -1141,9 +1244,9 @@ public class CommonMethods {
 		});
 		btnDone.setBounds(328, 208, 80, 23);
 		pnlDrinksOrder.add(btnDone);
-
+		
 		return pnlDrinksOrder;
-	}
+	}//end makePnlDrinksOrder method
 
 	// Snack Order
 	private Component makePnlSnacksOrder() {
@@ -1173,7 +1276,7 @@ public class CommonMethods {
 		// create header label for user data
 		JLabel snackQntyLbl = new JLabel("Enter Qnty");
 		snackQntyLbl.setBounds(335, 5, 60, 17);
-		snackQntyLbl.setForeground(c);
+		snackQntyLbl.setForeground(red);
 		pnlSnacksOrder.add(snackQntyLbl);
 
 		// position input fields
@@ -1187,6 +1290,17 @@ public class CommonMethods {
 		txtSnack7.setBounds(342, 136, 40, 17);
 		txtSnack8.setBounds(342, 152, 40, 17);
 
+		// name input fields
+		txtSnack0.setName("SNACK0");
+		txtSnack1.setName("SNACK1");
+		txtSnack2.setName("SNACK2");
+		txtSnack3.setName("SNACK3");
+		txtSnack4.setName("SNACK4");
+		txtSnack5.setName("SNACK5");
+		txtSnack6.setName("SNACK6");
+		txtSnack7.setName("SNACK7");
+		txtSnack8.setName("SNACK8");
+		
 		// add fields to panel
 		pnlSnacksOrder.add(txtSnack0);
 		pnlSnacksOrder.add(txtSnack1);
@@ -1205,9 +1319,9 @@ public class CommonMethods {
 
 		// display snack subtotal cost
 
-		final JLabel sSubtotal = new JLabel("$ "
-				+ Double.toString(snackSubtotal));
+		sSubtotal = new JLabel(df.format(snackSubtotal));
 		sSubtotal.setBounds(35, 214, 120, 23);
+		sSubtotal.setName("SN_SUB");
 		pnlSnacksOrder.add(sSubtotal);
 
 		// add SAVE button
@@ -1226,9 +1340,31 @@ public class CommonMethods {
 					snackQnty[7] = Integer.parseInt(txtSnack7.getText());
 					snackQnty[8] = Integer.parseInt(txtSnack8.getText());
 
+					drinkSubtotal = Double.parseDouble(lblDrinkInvoiceValue.getText().trim());
+					snackSubtotal = Double.parseDouble(lblSnackInvoiceValue.getText().trim());
+					entreeSubtotal = Double.parseDouble(lblEntreeInvoiceValue.getText().trim());
+					dessertSubtotal = Double.parseDouble(lblDessertInvoiceValue.getText().trim());
+					
 					clearSnackSubtotal();
 					calcSnacksSubtotal();
-					sSubtotal.setText("$ " + Double.toString(snackSubtotal));
+					calcTotalFoodSubtotal();
+					calcTotalTaxSubtotal();
+					calcTotalLaborSubtotal();
+					calcTotalItemsCost();
+					calcDepositAmount();
+					calcAmountPaid();
+					calcAmountDue();
+					calcDepositRemaining();
+				
+					lblAmntDueFinalValue.setText(calcAmountDue());
+					sSubtotal.setText(df.format(snackSubtotal));
+					lblSnackInvoiceValue.setText(df.format(snackSubtotal));
+					lblTaxInvoiceValue.setText(df.format(totalTaxSubtotal));
+					lblLaborValue.setText(df.format(totalLaborSubtotal));
+					lblTotalFinalValue.setText(df.format(totalItemsCost));
+					lblBalanceDueValue.setText(df.format(depositAmount));
+					lblBalanceRemainingValue.setText(df.format(depositRemaining));
+
 
 					pnlSnacksOrder.repaint();
 				}
@@ -1267,7 +1403,7 @@ public class CommonMethods {
 		// create header label for user data
 		JLabel entreeQntyLbl = new JLabel("Enter Qnty");
 		entreeQntyLbl.setBounds(335, 5, 60, 17);
-		entreeQntyLbl.setForeground(c);
+		entreeQntyLbl.setForeground(red);
 		pnlEntreesOrder.add(entreeQntyLbl);
 
 		// position input fields
@@ -1281,6 +1417,17 @@ public class CommonMethods {
 		txtEntree7.setBounds(342, 136, 40, 17);
 		txtEntree8.setBounds(342, 152, 40, 17);
 
+		// name input fields
+		txtEntree0.setName("ENTREE0");
+		txtEntree1.setName("ENTREE1");
+		txtEntree2.setName("ENTREE2");
+		txtEntree3.setName("ENTREE3");
+		txtEntree4.setName("ENTREE4");
+		txtEntree5.setName("ENTREE5");
+		txtEntree6.setName("ENTREE6");
+		txtEntree7.setName("ENTREE7");
+		txtEntree8.setName("ENTREE8");
+		
 		// add fields to panel
 		pnlEntreesOrder.add(txtEntree0);
 		pnlEntreesOrder.add(txtEntree1);
@@ -1298,9 +1445,9 @@ public class CommonMethods {
 		pnlEntreesOrder.add(eSubLbl);
 
 		// display entree subtotal cost
-		final JLabel eSubtotal = new JLabel("$ "
-				+ Double.toString(entreeSubtotal));
+		eSubtotal = new JLabel(df.format(entreeSubtotal));
 		eSubtotal.setBounds(35, 214, 120, 23);
+		eSubtotal.setName("EN_SUB");
 		pnlEntreesOrder.add(eSubtotal);
 
 		// add SAVE button
@@ -1319,9 +1466,31 @@ public class CommonMethods {
 					entreeQnty[7] = Integer.parseInt(txtEntree7.getText());
 					entreeQnty[8] = Integer.parseInt(txtEntree8.getText());
 
+					drinkSubtotal = Double.parseDouble(lblDrinkInvoiceValue.getText().trim());
+					snackSubtotal = Double.parseDouble(lblSnackInvoiceValue.getText().trim());
+					entreeSubtotal = Double.parseDouble(lblEntreeInvoiceValue.getText().trim());
+					dessertSubtotal = Double.parseDouble(lblDessertInvoiceValue.getText().trim());
+					
 					clearEntreeSubtotal();
 					calcEntreeSubtotal();
-					eSubtotal.setText("$ " + Double.toString(entreeSubtotal));
+					calcTotalFoodSubtotal();
+					calcTotalTaxSubtotal();
+					calcTotalLaborSubtotal();
+					calcTotalItemsCost();
+					calcDepositAmount();
+					calcAmountPaid();
+					calcAmountDue();
+					calcDepositRemaining();
+					
+					lblAmntDueFinalValue.setText(calcAmountDue());
+					eSubtotal.setText(df.format(entreeSubtotal));
+					lblEntreeInvoiceValue.setText(df.format(entreeSubtotal));
+					lblTaxInvoiceValue.setText(df.format(totalTaxSubtotal));
+					lblLaborValue.setText(df.format(totalLaborSubtotal));
+					lblTotalFinalValue.setText(df.format(totalItemsCost));
+					lblBalanceDueValue.setText(df.format(depositAmount));
+					lblBalanceRemainingValue.setText(df.format(depositRemaining));
+
 
 					pnlEntreesOrder.repaint();
 				}
@@ -1331,7 +1500,7 @@ public class CommonMethods {
 		pnlEntreesOrder.add(btnDone);
 
 		return pnlEntreesOrder;
-	}
+	}//end makePnlEntreesOrder method
 
 	// Dessert Order
 	private Component makePnlDessertsOrder() {
@@ -1361,7 +1530,7 @@ public class CommonMethods {
 		// create header label for user data
 		JLabel dessertQntyLbl = new JLabel("Enter Qnty");
 		dessertQntyLbl.setBounds(335, 5, 60, 17);
-		dessertQntyLbl.setForeground(c);
+		dessertQntyLbl.setForeground(red);
 		pnlDessertsOrder.add(dessertQntyLbl);
 
 		// position input fields
@@ -1376,6 +1545,18 @@ public class CommonMethods {
 		txtDessert8.setBounds(342, 152, 40, 17);
 		txtDessert9.setBounds(342, 168, 40, 17);
 
+		//name input fields
+		txtDessert0.setName("DESSERT0");
+		txtDessert1.setName("DESSERT1");
+		txtDessert2.setName("DESSERT2");
+		txtDessert3.setName("DESSERT3");
+		txtDessert4.setName("DESSERT4");
+		txtDessert5.setName("DESSERT5");
+		txtDessert6.setName("DESSERT6");
+		txtDessert7.setName("DESSERT7");
+		txtDessert8.setName("DESSERT8");
+		txtDessert9.setName("DESSERT9");
+		
 		// add fields to panel
 		pnlDessertsOrder.add(txtDessert0);
 		pnlDessertsOrder.add(txtDessert1);
@@ -1394,10 +1575,10 @@ public class CommonMethods {
 		pnlDessertsOrder.add(dSubLbl);
 
 		// display desserts subtotal cost
-		final JLabel dSubtotal = new JLabel("$ "
-				+ Double.toString(dessertSubtotal));
-		dSubtotal.setBounds(35, 214, 120, 23);
-		pnlDessertsOrder.add(dSubtotal);
+		deSubtotal = new JLabel(df.format(dessertSubtotal));
+		deSubtotal.setBounds(35, 214, 120, 23);
+		deSubtotal.setName("DE_SUB");
+		pnlDessertsOrder.add(deSubtotal);
 
 		// add SAVE button
 		JButton btnDone = new JButton("DONE");
@@ -1416,9 +1597,31 @@ public class CommonMethods {
 					dessertQnty[8] = Integer.parseInt(txtDessert8.getText());
 					dessertQnty[9] = Integer.parseInt(txtDessert9.getText());
 
+					drinkSubtotal = Double.parseDouble(lblDrinkInvoiceValue.getText().trim());
+					snackSubtotal = Double.parseDouble(lblSnackInvoiceValue.getText().trim());
+					entreeSubtotal = Double.parseDouble(lblEntreeInvoiceValue.getText().trim());
+					dessertSubtotal = Double.parseDouble(lblDessertInvoiceValue.getText().trim());
+					
 					clearDessertSubtotal();
 					calcDessertSubtotal();
-					dSubtotal.setText("$ " + Double.toString(dessertSubtotal));
+					calcTotalFoodSubtotal();
+					calcTotalTaxSubtotal();
+					calcTotalLaborSubtotal();
+					calcTotalItemsCost();
+					calcDepositAmount();
+					calcAmountPaid();
+					calcAmountDue();
+					calcDepositRemaining();
+					
+					lblAmntDueFinalValue.setText(calcAmountDue());
+					deSubtotal.setText(df.format(dessertSubtotal));
+					lblDessertInvoiceValue.setText(df.format(dessertSubtotal));
+					lblTaxInvoiceValue.setText(df.format(totalTaxSubtotal));
+					lblLaborValue.setText(df.format(totalLaborSubtotal));
+					lblTotalFinalValue.setText(df.format(totalItemsCost));
+					lblBalanceDueValue.setText(df.format(depositAmount));
+					lblBalanceRemainingValue.setText(df.format(depositRemaining));
+
 
 					pnlDessertsOrder.repaint();
 				}
@@ -1900,7 +2103,7 @@ public class CommonMethods {
 		} catch (TransformerException tfe) {
 			tfe.printStackTrace();
 		}
-	}
+	}//end appendXML method
 
 	/**
 	 * Creates the XML Schema for a new event
@@ -1944,11 +2147,6 @@ public class CommonMethods {
 		evNotes.appendChild(doc.createTextNode(txtNotes.getText().trim()));
 		event.appendChild(evNotes);
 
-		// AMOUNT PAID element
-		Element evPaid = doc.createElement("PAID");
-		evPaid.appendChild(doc.createTextNode(txtAmountPaid.getText().trim()));
-		event.appendChild(evPaid);
-
 		// CLIENT FN element
 		Element clFN = doc.createElement("CL_FN");
 		clFN.appendChild(doc.createTextNode(txtFN.getText().trim()));
@@ -1989,9 +2187,276 @@ public class CommonMethods {
 		Element clEmail = doc.createElement("CL_EMAIL");
 		clEmail.appendChild(doc.createTextNode(txtEmail.getText().trim()));
 		event.appendChild(clEmail);
+		
+		// ORDER Drink0 element
+		Element drZero = doc.createElement("DR_QNTY0");
+		drZero.appendChild(doc.createTextNode(txtDrink0.getText().trim()));
+		event.appendChild(drZero);
+		
+		// ORDER Drink1 element
+		Element drOne = doc.createElement("DR_QNTY1");
+		drOne.appendChild(doc.createTextNode(txtDrink1.getText().trim()));
+		event.appendChild(drOne);
+		
+		// ORDER Drink2 element
+		Element drTwo = doc.createElement("DR_QNTY2");
+		drTwo.appendChild(doc.createTextNode(txtDrink2.getText().trim()));
+		event.appendChild(drTwo);
+		
+		// ORDER Drink3 element
+		Element drThree = doc.createElement("DR_QNTY3");
+		drThree.appendChild(doc.createTextNode(txtDrink3.getText().trim()));
+		event.appendChild(drThree);
+		
+		// ORDER Drink4 element
+		Element drFour = doc.createElement("DR_QNTY4");
+		drFour.appendChild(doc.createTextNode(txtDrink4.getText().trim()));
+		event.appendChild(drFour);
+				
+		// ORDER Drink5 element
+		Element drFive = doc.createElement("DR_QNTY5");
+		drFive.appendChild(doc.createTextNode(txtDrink5.getText().trim()));
+		event.appendChild(drFive);
+		
+		// ORDER Drink6 element
+		Element drSix = doc.createElement("DR_QNTY6");
+		drSix.appendChild(doc.createTextNode(txtDrink6.getText().trim()));
+		event.appendChild(drSix);
+		
+		// ORDER Drink7 element
+		Element drSeven = doc.createElement("DR_QNTY7");
+		drSeven.appendChild(doc.createTextNode(txtDrink7.getText().trim()));
+		event.appendChild(drSeven);
+		
+		// ORDER Drink8 element
+		Element drEight = doc.createElement("DR_QNTY8");
+		drEight.appendChild(doc.createTextNode(txtDrink8.getText().trim()));
+		event.appendChild(drEight);
+		
+		//DR_SUB element
+		Element drSub = doc.createElement("DR_SUB");
+		drSub.appendChild(doc.createTextNode(dSubtotal.getText().trim()));
+		event.appendChild(drSub);
 
+		// ORDER Snack0 element
+		Element snZero = doc.createElement("SN_QNTY0");
+		snZero.appendChild(doc.createTextNode(txtSnack0.getText().trim()));
+		event.appendChild(snZero);
+		
+		// ORDER Snack1 element
+		Element snOne = doc.createElement("SN_QNTY1");
+		snOne.appendChild(doc.createTextNode(txtSnack1.getText().trim()));
+		event.appendChild(snOne);
+		
+		// ORDER Snack2 element
+		Element snTwo = doc.createElement("SN_QNTY2");
+		snTwo.appendChild(doc.createTextNode(txtSnack2.getText().trim()));
+		event.appendChild(snTwo);
+		
+		// ORDER Snack3 element
+		Element snThree = doc.createElement("SN_QNTY3");
+		snThree.appendChild(doc.createTextNode(txtSnack3.getText().trim()));
+		event.appendChild(snThree);
+		
+		// ORDER Snack4 element
+		Element snFour = doc.createElement("SN_QNTY4");
+		snFour.appendChild(doc.createTextNode(txtSnack4.getText().trim()));
+		event.appendChild(snFour);
+		
+		// ORDER Snack5 element
+		Element snFive = doc.createElement("SN_QNTY5");
+		snFive.appendChild(doc.createTextNode(txtSnack5.getText().trim()));
+		event.appendChild(snFive);
+		
+		// ORDER Snack6 element
+		Element snSix = doc.createElement("SN_QNTY6");
+		snSix.appendChild(doc.createTextNode(txtSnack6.getText().trim()));
+		event.appendChild(snSix);
+		
+		// ORDER Snack7 element
+		Element snSeven = doc.createElement("SN_QNTY7");
+		snSeven.appendChild(doc.createTextNode(txtSnack7.getText().trim()));
+		event.appendChild(snSeven);
+		
+		// ORDER Snack8 element
+		Element snEight = doc.createElement("SN_QNTY8");
+		snEight.appendChild(doc.createTextNode(txtSnack8.getText().trim()));
+		event.appendChild(snEight);
+		
+		//SN_SUB element
+		Element snSub = doc.createElement("SN_SUB");
+		snSub.appendChild(doc.createTextNode(sSubtotal.getText().trim()));
+		event.appendChild(snSub);
+		
+		// ORDER Entree0 element
+		Element enZero = doc.createElement("EN_QNTY0");
+		enZero.appendChild(doc.createTextNode(txtEntree0.getText().trim()));
+		event.appendChild(enZero);
+				
+		// ORDER Entree1 element
+		Element enOne = doc.createElement("EN_QNTY1");
+		enOne.appendChild(doc.createTextNode(txtEntree1.getText().trim()));
+		event.appendChild(enOne);
+				
+		// ORDER Entree2 element
+		Element enTwo = doc.createElement("EN_QNTY2");
+		enTwo.appendChild(doc.createTextNode(txtEntree2.getText().trim()));
+		event.appendChild(enTwo);
+		
+		// ORDER Entree3 element
+		Element enThree = doc.createElement("EN_QNTY3");
+		enThree.appendChild(doc.createTextNode(txtEntree3.getText().trim()));
+		event.appendChild(enThree);
+		
+		// ORDER Entree4 element
+		Element enFour = doc.createElement("EN_QNTY4");
+		enFour.appendChild(doc.createTextNode(txtEntree4.getText().trim()));
+		event.appendChild(enFour);
+		
+		// ORDER Entree5 element
+		Element enFive = doc.createElement("EN_QNTY5");
+		enFive.appendChild(doc.createTextNode(txtEntree5.getText().trim()));
+		event.appendChild(enFive);
+		
+		// ORDER Entree6 element
+		Element enSix = doc.createElement("EN_QNTY6");
+		enSix.appendChild(doc.createTextNode(txtEntree6.getText().trim()));
+		event.appendChild(enSix);
+		
+		// ORDER Entree7 element
+		Element enSeven = doc.createElement("EN_QNTY7");
+		enSeven.appendChild(doc.createTextNode(txtEntree7.getText().trim()));
+		event.appendChild(enSeven);
+		
+		// ORDER Entree8 element
+		Element enEight = doc.createElement("EN_QNTY8");
+		enEight.appendChild(doc.createTextNode(txtEntree8.getText().trim()));
+		event.appendChild(enEight);
+		
+		//EN_SUB element
+		Element enSub = doc.createElement("EN_SUB");
+		enSub.appendChild(doc.createTextNode(eSubtotal.getText().trim()));
+		event.appendChild(enSub);
+		
+		// ORDER Dessert0 element
+		Element deZero = doc.createElement("DE_QNTY0");
+		deZero.appendChild(doc.createTextNode(txtDessert0.getText().trim()));
+		event.appendChild(deZero);
+		
+		// ORDER Dessert1 element
+		Element deOne = doc.createElement("DE_QNTY1");
+		deOne.appendChild(doc.createTextNode(txtDessert1.getText().trim()));
+		event.appendChild(deOne);
+		
+		// ORDER Dessert2 element
+		Element deTwo = doc.createElement("DE_QNTY2");
+		deTwo.appendChild(doc.createTextNode(txtDessert2.getText().trim()));
+		event.appendChild(deTwo);
+		
+		// ORDER Dessert3 element
+		Element deThree = doc.createElement("DE_QNTY3");
+		deThree.appendChild(doc.createTextNode(txtDessert3.getText().trim()));
+		event.appendChild(deThree);
+		
+		// ORDER Dessert4 element
+		Element deFour = doc.createElement("DE_QNTY4");
+		deFour.appendChild(doc.createTextNode(txtDessert4.getText().trim()));
+		event.appendChild(deFour);
+		
+		// ORDER Dessert5 element
+		Element deFive = doc.createElement("DE_QNTY5");
+		deFive.appendChild(doc.createTextNode(txtDessert5.getText().trim()));
+		event.appendChild(deFive);
+		
+		// ORDER Dessert6 element
+		Element deSix = doc.createElement("DE_QNTY6");
+		deSix.appendChild(doc.createTextNode(txtDessert6.getText().trim()));
+		event.appendChild(deSix);
+		
+		// ORDER Dessert7 element
+		Element deSeven = doc.createElement("DE_QNTY7");
+		deSeven.appendChild(doc.createTextNode(txtDessert7.getText().trim()));
+		event.appendChild(deSeven);
+		
+		// ORDER Dessert8 element
+		Element deEight = doc.createElement("DE_QNTY8");
+		deEight.appendChild(doc.createTextNode(txtDessert8.getText().trim()));
+		event.appendChild(deEight);
+		
+		// ORDER Dessert9 element
+		Element deNine = doc.createElement("DE_QNTY9");
+		deNine.appendChild(doc.createTextNode(txtDessert9.getText().trim()));
+		event.appendChild(deNine);
+		
+		//DE_SUB element
+		Element deSub = doc.createElement("DE_SUB");
+		deSub.appendChild(doc.createTextNode(deSubtotal.getText().trim()));
+		event.appendChild(deSub);
+		
+		
+		//INVOICING
+		//DrinkSubtotal element
+		Element drinkSubtotal = doc.createElement("DR_SUB_INV");
+		drinkSubtotal.appendChild(doc.createTextNode(lblDrinkInvoiceValue.getText().trim()));
+		event.appendChild(drinkSubtotal);
+		
+		//SnackSubtotal element
+		Element snackSubtotal = doc.createElement("SN_SUB_INV");
+		snackSubtotal.appendChild(doc.createTextNode(lblSnackInvoiceValue.getText().trim()));
+		event.appendChild(snackSubtotal);
+		
+		
+		//EntreeSubtotal element
+		Element entreeSubtotal = doc.createElement("EN_SUB_INV");
+		entreeSubtotal.appendChild(doc.createTextNode(lblEntreeInvoiceValue.getText().trim()));
+		event.appendChild(entreeSubtotal);
+		
+		//DessertSubtotal element
+		Element dessertSubtotal = doc.createElement("DE_SUB_INV");
+		dessertSubtotal.appendChild(doc.createTextNode(lblDessertInvoiceValue.getText().trim()));
+		event.appendChild(dessertSubtotal);
+		
+		//Tax element
+		Element totalTaxSubtotal = doc.createElement("TXV_SUB");
+		totalTaxSubtotal.appendChild(doc.createTextNode(lblTaxInvoiceValue.getText().trim()));
+		event.appendChild(totalTaxSubtotal);
+		
+		//Labor element
+		Element totalLaborSubtotal = doc.createElement("LV_SUB");
+		totalLaborSubtotal.appendChild(doc.createTextNode(lblLaborValue.getText().trim()));
+		event.appendChild(totalLaborSubtotal);
+		
+		//Balance element
+		Element balanceDue = doc.createElement("BAL_SUB");
+		balanceDue.appendChild(doc.createTextNode(lblBalanceDueValue.getText().trim()));
+		event.appendChild(balanceDue);
+		
+		//Balance Remaining element
+		Element depRemain = doc.createElement("BAL_REM_SUB");
+		depRemain.appendChild(doc.createTextNode(lblBalanceRemainingValue.getText().trim()));
+		event.appendChild(depRemain);
+		
+		//Total element
+		Element totalFinalValue = doc.createElement("TFV_SUB");
+		totalFinalValue.appendChild(doc.createTextNode(lblTotalFinalValue.getText().trim()));
+		event.appendChild(totalFinalValue);
+		
+		//Amount Paid element
+		Element amountPaid = doc.createElement("APFV_SUB");
+		amountPaid.appendChild(doc.createTextNode(lblAmntPaidFinalValue.getText().trim()));
+		event.appendChild(amountPaid);
+		
+		//Amount Due element
+		Element amountDue = doc.createElement("ADFV_SUB");
+		amountDue.appendChild(doc.createTextNode(lblAmntDueFinalValue.getText().trim()));
+		event.appendChild(amountDue);
+		
+		
+
+		
+		
 		return doc;
-	}
+	}//end addNewEvent method
 
 	/**
 	 * Creates a new XML document if it does not exists
@@ -2123,11 +2588,6 @@ public class CommonMethods {
 								node.setTextContent(txtNotes.getText().trim());
 							}
 
-							// get the AMOUNT PAID element, and update the value
-							if (node.getNodeName().equals("PAID")) {
-								node.setTextContent(txtAmountPaid.getText()
-										.trim());
-							}
 
 							// updating the CLIENT Tab elements
 
@@ -2172,11 +2632,275 @@ public class CommonMethods {
 								node.setTextContent(txtEmail.getText().trim());
 							}
 
-						}
+							// get the ORDER info and update...
+							
+							// get the DR_QNTY1 element, and update the value
+							if (node.getNodeName().equals("DR_QNTY0")) {
+								node.setTextContent(txtDrink0.getText().trim());
+							}
+							
+							// get the DR_QNTY2 element, and update the value
+							if (node.getNodeName().equals("DR_QNTY1")) {
+								node.setTextContent(txtDrink1.getText().trim());
+							}
+							
+							// get the DR_QNTY3 element, and update the value
+							if (node.getNodeName().equals("DR_QNTY2")) {
+								node.setTextContent(txtDrink2.getText().trim());
+							}
+							
+							// get the DR_QNTY4 element, and update the value
+							if (node.getNodeName().equals("DR_QNTY3")) {
+								node.setTextContent(txtDrink3.getText().trim());
+							}
+							
+							// get the DR_QNTY5 element, and update the value
+							if (node.getNodeName().equals("DR_QNTY4")) {
+								node.setTextContent(txtDrink4.getText().trim());
+							}
+							
+							// get the DR_QNTY6 element, and update the value
+							if (node.getNodeName().equals("DR_QNTY5")) {
+								node.setTextContent(txtDrink5.getText().trim());
+							}
+							
+							// get the DR_QNTY7 element, and update the value
+							if (node.getNodeName().equals("DR_QNTY6")) {
+								node.setTextContent(txtDrink6.getText().trim());
+							}
+							
+							// get the DR_QNTY8 element, and update the value
+							if (node.getNodeName().equals("DR_QNTY7")) {
+								node.setTextContent(txtDrink7.getText().trim());
+							}
+							
+							// get the DR_QNTY9 element, and update the value
+							if (node.getNodeName().equals("DR_QNTY8")) {
+								node.setTextContent(txtDrink8.getText().trim());
+							}
+							
+							// get the SN_QNTY1 element, and update the value
+							if (node.getNodeName().equals("SN_QNTY0")) {
+								node.setTextContent(txtSnack0.getText().trim());
+							}
+							
+							// get the SN_QNTY2 element, and update the value
+							if (node.getNodeName().equals("SN_QNTY1")) {
+								node.setTextContent(txtSnack1.getText().trim());
+							}
+							
+							// get the SN_QNTY3 element, and update the value
+							if (node.getNodeName().equals("SN_QNTY2")) {
+								node.setTextContent(txtSnack2.getText().trim());
+							}
+							
+							// get the SN_QNTY4 element, and update the value
+							if (node.getNodeName().equals("SN_QNTY3")) {
+								node.setTextContent(txtSnack3.getText().trim());
+							}
+							
+							// get the SN_QNTY5 element, and update the value
+							if (node.getNodeName().equals("SN_QNTY4")) {
+								node.setTextContent(txtSnack4.getText().trim());
+							}
+							
+							// get the SN_QNTY6 element, and update the value
+							if (node.getNodeName().equals("SN_QNTY5")) {
+								node.setTextContent(txtSnack5.getText().trim());
+							}
+							
+							// get the SN_QNTY7 element, and update the value
+							if (node.getNodeName().equals("SN_QNTY6")) {
+								node.setTextContent(txtSnack6.getText().trim());
+							}
+							
+							// get the SN_QNTY8 element, and update the value
+							if (node.getNodeName().equals("SN_QNTY7")) {
+								node.setTextContent(txtSnack7.getText().trim());
+							}
+							
+							// get the SN_QNTY9 element, and update the value
+							if (node.getNodeName().equals("SN_QNTY8")) {
+								node.setTextContent(txtSnack8.getText().trim());
+							}
+							
+							// get the EN_QNTY1 element, and update the value
+							if (node.getNodeName().equals("EN_QNTY0")) {
+								node.setTextContent(txtEntree0.getText().trim());
+							}
+							
+							// get the EN_QNTY2 element, and update the value
+							if (node.getNodeName().equals("EN_QNTY1")) {
+								node.setTextContent(txtEntree1.getText().trim());
+							}
+							
+							// get the EN_QNTY3 element, and update the value
+							if (node.getNodeName().equals("EN_QNTY2")) {
+								node.setTextContent(txtEntree2.getText().trim());
+							}
+							
+							// get the EN_QNTY4 element, and update the value
+							if (node.getNodeName().equals("EN_QNTY3")) {
+								node.setTextContent(txtEntree3.getText().trim());
+							}
+							
+							// get the EN_QNTY5 element, and update the value
+							if (node.getNodeName().equals("EN_QNTY4")) {
+								node.setTextContent(txtEntree4.getText().trim());
+							}
+							
+							// get the EN_QNTY6 element, and update the value
+							if (node.getNodeName().equals("EN_QNTY5")) {
+								node.setTextContent(txtEntree5.getText().trim());
+							}
+							
+							// get the EN_QNTY7 element, and update the value
+							if (node.getNodeName().equals("EN_QNTY6")) {
+								node.setTextContent(txtEntree6.getText().trim());
+							}
+							
+							// get the EN_QNTY8 element, and update the value
+							if (node.getNodeName().equals("EN_QNTY7")) {
+								node.setTextContent(txtEntree7.getText().trim());
+							}
+							
+							// get the EN_QNTY9 element, and update the value
+							if (node.getNodeName().equals("EN_QNTY8")) {
+								node.setTextContent(txtEntree8.getText().trim());
+							}
+							
+							// get the DE_QNTY1 element, and update the value
+							if (node.getNodeName().equals("DE_QNTY0")) {
+								node.setTextContent(txtDessert0.getText().trim());
+							}
+							
+							// get the DE_QNTY2 element, and update the value
+							if (node.getNodeName().equals("DE_QNTY1")) {
+								node.setTextContent(txtDessert1.getText().trim());
+							}
+							
+							// get the DE_QNTY3 element, and update the value
+							if (node.getNodeName().equals("DE_QNTY2")) {
+								node.setTextContent(txtDessert2.getText().trim());
+							}
+							
+							// get the DE_QNTY4 element, and update the value
+							if (node.getNodeName().equals("DE_QNTY3")) {
+								node.setTextContent(txtDessert3.getText().trim());
+							}
+							
+							// get the DE_QNTY5 element, and update the value
+							if (node.getNodeName().equals("DE_QNTY4")) {
+								node.setTextContent(txtDessert4.getText().trim());
+							}
+							
+							// get the DE_QNTY6 element, and update the value
+							if (node.getNodeName().equals("DE_QNTY5")) {
+								node.setTextContent(txtDessert5.getText().trim());
+							}
+							
+							// get the DE_QNTY7 element, and update the value
+							if (node.getNodeName().equals("DE_QNTY6")) {
+								node.setTextContent(txtDessert6.getText().trim());
+							}
+							
+							// get the DE_QNTY8 element, and update the value
+							if (node.getNodeName().equals("DE_QNTY7")) {
+								node.setTextContent(txtDessert7.getText().trim());
+							}
+							
+							// get the DE_QNTY9 element, and update the value
+							if (node.getNodeName().equals("DE_QNTY8")) {
+								node.setTextContent(txtDessert8.getText().trim());
+							}
+							
+							// get the DE_QNTY10 element, and update the value
+							if (node.getNodeName().equals("DE_QNTY9")) {
+								node.setTextContent(txtDessert9.getText().trim());
+							}
+			
+							// get the DR_SUB element, and update the value
+							if (node.getNodeName().equals("DR_SUB")) {
+								node.setTextContent(dSubtotal.getText().trim());
+							}
+							
+							
+							// get the SN_SUB element, and update the value
+							if (node.getNodeName().equals("SN_SUB")) {
+								node.setTextContent(sSubtotal.getText().trim());
+							}
+							
+							
+							// get the EN_SUB element, and update the value
+							if (node.getNodeName().equals("EN_SUB")) {
+								node.setTextContent(eSubtotal.getText().trim());
+							}
+							
+							// get the DE_SUB element, and update the value
+							if (node.getNodeName().equals("DE_SUB")) {
+								node.setTextContent(deSubtotal.getText().trim());
+							}
+							
+							// get the DR_SUB_INV element, and update the value
+							if (node.getNodeName().equals("DR_SUB_INV")) {
+								node.setTextContent(lblDrinkInvoiceValue.getText().trim());
+							}
+							
+							// get the SN_SUB_INV element, and update the value
+							if (node.getNodeName().equals("SN_SUB_INV")) {
+								node.setTextContent(lblSnackInvoiceValue.getText().trim());
+							}
+							
+							// get the EN_SUB_INV element, and update the value
+							if (node.getNodeName().equals("EN_SUB_INV")) {
+								node.setTextContent(lblEntreeInvoiceValue.getText().trim());
+							}
+							
+							// get the DE_SUB_INV element, and update the value
+							if (node.getNodeName().equals("DE_SUB_INV")) {
+								node.setTextContent(lblDessertInvoiceValue.getText().trim());
+							}
+							
+							// get the TXV_SUB element, and update the value
+							if (node.getNodeName().equals("TXV_SUB")) {
+								node.setTextContent(lblTaxInvoiceValue.getText().trim());
+							}
+							
+							// get the LV_SUB element, and update the value
+							if (node.getNodeName().equals("LV_SUB")) {
+								node.setTextContent(lblLaborValue.getText().trim());
+							}
+							
+							// get the BAL_SUB element, and update the value
+							if (node.getNodeName().equals("BAL_SUB")) {
+								node.setTextContent(lblBalanceDueValue.getText().trim());
+							}
+							
+							// get the BAL_REM_SUB element, and update the value
+							if (node.getNodeName().equals("BAL_REM_SUB")) {
+								node.setTextContent(lblBalanceRemainingValue.getText().trim());
+							}
+							
+							// get the TFV_SUB element, and update the value
+							if (node.getNodeName().equals("TFV_SUB")) {
+								node.setTextContent(lblTotalFinalValue.getText().trim());
+							}
+							
+							// get the APFV_SUB element, and update the value
+							if (node.getNodeName().equals("APFV_SUB")) {
+								node.setTextContent(lblAmntPaidFinalValue.getText().trim());
+							}
+							
+							// get the ADFV_SUB element, and update the value
+							if (node.getNodeName().equals("ADFV_SUB")) {
+								node.setTextContent(lblAmntDueFinalValue.getText().trim());
+							}
+							
+						}//end for loop that updates values
 
-					}
-				}
-			}
+					}//end if statement
+				}//end if statement
+			}//end outer loop that finds events
 
 			// write the content into xml file
 			TransformerFactory transformerFactory = TransformerFactory
@@ -2197,5 +2921,5 @@ public class CommonMethods {
 		} catch (SAXException sae) {
 			sae.printStackTrace();
 		}
-	}
-}
+	}//end updateXML method
+}//end CommonMethods class
