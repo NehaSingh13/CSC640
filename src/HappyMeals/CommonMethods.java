@@ -5,6 +5,8 @@
 package HappyMeals;
 
 import java.awt.Color;
+import java.io.File;
+import java.io.RandomAccessFile;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -102,10 +104,11 @@ public class CommonMethods {
 
 	JTextArea txtNotes;
 	JRadioButton rdbtnOurBanquet, rdbtnOther;
+	JCheckBox chkStaff1, chkStaff2, chkStaff3, chkStaff4, chkStaff5, chkStaff6, chkStaff7, chkStaff8;
 	ButtonGroup rdbtnGroupVenue;
 	JComboBox<Object> cmbStates;
 	JTabbedPane tabpnlAdd;
-
+	JTextArea tA;
 	// tabs for order info
 	JTabbedPane tabpnlAdd2;
 
@@ -1440,17 +1443,18 @@ public class CommonMethods {
 		lblAddHead.setFont(new Font("Tahoma", Font.BOLD, 16));
 		lblAddHead.setBounds(146, 12, 174, 27);
 		pnlChefInstructions.add(lblAddHead);
-
-		JTextArea tA = new JTextArea("");
+        
+		tA = new JTextArea("");
 		tA.setBounds(20, 40, 420, 150);
 		tA.append("\tITEMS\t\tQNTY\n-------------------------------------------------------------------------------------------------------------\n");
+		tA.setName("SCROLL");
 		pnlChefInstructions.add(tA);
 
 		// add scroll pane
 		JScrollPane sp = new JScrollPane(tA);
 		sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-		sp.setName("SCROLL");
+		
 		sp.setBounds(20, 40, 420, 150);
 		pnlChefInstructions.add(sp);
 
@@ -1485,12 +1489,15 @@ public class CommonMethods {
 		JButton btnNext = new JButton("SAVE TO FILE");
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// /TODO code
+				
 				JOptionPane
 						.showMessageDialog(
 								null,
-								"SORRY! This code is yet to be implemented.\n Please try again later...\n\n",
-								"SAVE TO FILE", JOptionPane.OK_OPTION);
+								"File for Chef Instructions for this Event Saved...\n\n",
+								"SAVE TO FILE", JOptionPane.INFORMATION_MESSAGE);
+				
+				writeToFile(tA.getText());
+				
 			}
 		});
 		btnNext.setBounds(350, 212, 130, 23);
@@ -1510,14 +1517,14 @@ public class CommonMethods {
 		lblAddHead.setBounds(146, 12, 174, 27);
 		pnlAssignStaff.add(lblAddHead);
 
-		JCheckBox chkStaff1 = new JCheckBox("Amanda");
-		JCheckBox chkStaff2 = new JCheckBox("Brian");
-		JCheckBox chkStaff3 = new JCheckBox("Charlie");
-		JCheckBox chkStaff4 = new JCheckBox("Scott");
-		JCheckBox chkStaff5 = new JCheckBox("Janet");
-		JCheckBox chkStaff6 = new JCheckBox("Lisa");
-		JCheckBox chkStaff7 = new JCheckBox("Mike");
-		JCheckBox chkStaff8 = new JCheckBox("Allison");
+		chkStaff1 = new JCheckBox("Amanda");
+		chkStaff2 = new JCheckBox("Brian");
+		chkStaff3 = new JCheckBox("Charlie");
+		chkStaff4 = new JCheckBox("Scott");
+		chkStaff5 = new JCheckBox("Janet");
+		chkStaff6 = new JCheckBox("Lisa");
+		chkStaff7 = new JCheckBox("Mike");
+		chkStaff8 = new JCheckBox("Allison");
 
 		chkStaff1.setBounds(80, 40, 113, 23);
 		chkStaff2.setBounds(80, 60, 113, 23);
@@ -1989,6 +1996,51 @@ public class CommonMethods {
 		Element clEmail = doc.createElement("CL_EMAIL");
 		clEmail.appendChild(doc.createTextNode(txtEmail.getText().trim()));
 		event.appendChild(clEmail);
+		
+		//CHEF TEXT element
+		/*Element chefscroll = doc.createElement("SCROLL");
+		chefscroll.appendChild(doc.createTextNode(""));
+		event.appendChild(chefscroll);*/
+		
+		//STAFF1
+		Element st_assign1 = doc.createElement("ST_ASSIGN1");
+		st_assign1.appendChild(doc.createTextNode(""));
+		event.appendChild(st_assign1);
+		
+		//STAFF2
+		Element st_assign2 = doc.createElement("ST_ASSIGN2");
+		st_assign2.appendChild(doc.createTextNode(""));
+		event.appendChild(st_assign2);
+		
+		//STAFF3
+		Element st_assign3 = doc.createElement("ST_ASSIGN1");
+		st_assign3.appendChild(doc.createTextNode(""));
+		event.appendChild(st_assign3);
+		
+		//STAFF4
+		Element st_assign4 = doc.createElement("ST_ASSIGN4");
+		st_assign4.appendChild(doc.createTextNode(""));
+		event.appendChild(st_assign4);
+		
+		//STAFF5
+		Element st_assign5 = doc.createElement("ST_ASSIGN5");
+		st_assign5.appendChild(doc.createTextNode(""));
+		event.appendChild(st_assign5);
+		
+		//STAFF6
+		Element st_assign6 = doc.createElement("ST_ASSIGN6");
+		st_assign6.appendChild(doc.createTextNode(""));
+		event.appendChild(st_assign6);
+		
+		//STAFF7
+		Element st_assign7 = doc.createElement("ST_ASSIGN7");
+		st_assign7.appendChild(doc.createTextNode(""));
+		event.appendChild(st_assign7);
+		
+		//STAFF8
+		Element st_assign8 = doc.createElement("ST_ASSIGN8");
+		st_assign8.appendChild(doc.createTextNode(""));
+		event.appendChild(st_assign8);
 
 		return doc;
 	}
@@ -2060,6 +2112,25 @@ public class CommonMethods {
 
 	}
 
+	 public void writeToFile(String text){
+		//create a text file on chef_inst save to file button
+		 try {
+		 	String filename = "chef_"+txtEventName.getText().trim()+".txt";
+		      File f1 = new File(filename);
+		      if (!f1.exists()) { 
+		    	  f1.createNewFile();
+		       }
+		      
+	    	RandomAccessFile file = new RandomAccessFile(f1, "rw");
+	    	//file.seek(position);
+	    	file.writeUTF(text);
+	    	file.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    	
+	    }
 	/**
 	 * Updates the file by saving changes made by the user for the selected
 	 * event
@@ -2073,6 +2144,8 @@ public class CommonMethods {
 					.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 			Document doc = docBuilder.parse(xmlFile);
+			
+				   	   
 
 			NodeList nList = doc.getElementsByTagName("EVENT");
 			for (int temp = 0; temp < nList.getLength(); temp++) {
@@ -2085,7 +2158,8 @@ public class CommonMethods {
 					if (eElement.getAttribute("NAME").equals(selEvent)) {
 						eElement.setAttribute("NAME", txtEventName.getText()
 								.trim());
-
+						
+						
 						NodeList list = eElement.getChildNodes(); // get the
 																	// list of
 																	// all nodes
@@ -2170,6 +2244,84 @@ public class CommonMethods {
 							// get the EMAIL element, and update the value
 							if (node.getNodeName().equals("CL_EMAIL")) {
 								node.setTextContent(txtEmail.getText().trim());
+							}
+							
+							// updating the chef instructions
+							
+							// get the CHEf_INST element, and update the value
+							/*if (node.getNodeName().equals("SCROLL")) {
+								if(!tA.getText().equals(""))
+									node.setTextContent(tA.getText().trim());								
+								else
+								    node.setTextContent("");
+								   	
+							}*/
+							
+							
+							// updating the assign staff element
+							
+							// get the STAFF1 element, and update the value
+							if (node.getNodeName().equals("ST_ASSIGN1")) {
+								if(chkStaff1.isSelected())
+									node.setTextContent(chkStaff1.getText().trim());
+								else
+									node.setTextContent("");
+							}
+							
+							// get the STAFF2 element, and update the value
+							if (node.getNodeName().equals("ST_ASSIGN2")) {
+								if(chkStaff2.isSelected())
+								    node.setTextContent(chkStaff2.getText().trim());
+								else
+									node.setTextContent("");
+							} 
+							
+							// get the STAFF3 element, and update the value
+							if (node.getNodeName().equals("ST_ASSIGN3")) {
+								if(chkStaff3.isSelected())
+								    node.setTextContent(chkStaff3.getText().trim());
+								else
+									node.setTextContent("");
+							}
+							
+							// get the STAFF4 element, and update the value
+							if (node.getNodeName().equals("ST_ASSIGN4")) {
+								if(chkStaff4.isSelected())
+								    node.setTextContent(chkStaff4.getText().trim());
+								else
+									node.setTextContent("");
+							}
+							
+							// get the STAFF5 element, and update the value
+							if (node.getNodeName().equals("ST_ASSIGN5")) {
+								if(chkStaff5.isSelected())
+								    node.setTextContent(chkStaff5.getText().trim());
+								else
+									node.setTextContent("");
+							}
+							
+							// get the STAFF6 element, and update the value
+							if (node.getNodeName().equals("ST_ASSIGN6")) {
+								if(chkStaff6.isSelected())
+								    node.setTextContent(chkStaff6.getText().trim());
+								else
+									node.setTextContent("");
+							}
+							
+							// get the STAFF7 element, and update the value
+							if (node.getNodeName().equals("ST_ASSIGN7")) {
+								if(chkStaff7.isSelected())
+      								node.setTextContent(chkStaff7.getText().trim());
+								else
+									node.setTextContent("");
+							}
+							
+							// get the STAFF8 element, and update the value
+							if (node.getNodeName().equals("ST_ASSIGN8")) {
+								if(chkStaff8.isSelected())
+								    node.setTextContent(chkStaff8.getText().trim());
+								else
+									node.setTextContent("");
 							}
 
 						}

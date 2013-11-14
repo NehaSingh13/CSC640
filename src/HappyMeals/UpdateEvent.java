@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -25,6 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JCheckBox;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -250,6 +252,91 @@ public class UpdateEvent {
 							}
 						}
 						
+						/** We are populating the details for the Chef Instructions*/
+						/*Component[] tabCompChef = ((JPanel)(tabPan.getComponents()[4])).getComponents();
+						for(int i=0; i< tabCompChef.length;i++)
+						{
+							if(tabCompChef[i].getName() != null){
+								switch(tabCompChef[i].getName()){
+								case "SCROLL": ((JTextArea) (((JScrollPane) tabCompChef[i]).getViewport()).getView()).setText(eElement.getElementsByTagName("Chef Instructions").item(0).getTextContent()); break;
+								default: System.out.println("Error in getting Chef Details");
+								}
+							}
+						}*/
+						/** We are populating the details for the Assign Staff*/
+						Component[] tabCompStaff = ((JPanel)(tabPan.getComponents()[5])).getComponents();
+						
+						for(int i=0; i< tabCompStaff.length;i++)
+						{
+							if(tabCompStaff[i].getName() != null){
+								switch(tabCompStaff[i].getName()){
+								case "S1":
+									if(eElement.getElementsByTagName("ST_ASSIGN1").item(0) != null){
+										if(!eElement.getElementsByTagName("ST_ASSIGN1").item(0).getTextContent().equals("")){
+											((JCheckBox) tabCompStaff[i]).setSelected(true);
+										}
+											
+									}
+									break;
+								case "S2":
+									if(eElement.getElementsByTagName("ST_ASSIGN2").item(0) != null){
+										if(!eElement.getElementsByTagName("ST_ASSIGN2").item(0).getTextContent().equals("")){
+											((JCheckBox) tabCompStaff[i]).setSelected(true);
+										}
+											
+									}
+									break;
+								case "S3":
+									if(eElement.getElementsByTagName("ST_ASSIGN3").item(0) != null){
+										if(!eElement.getElementsByTagName("ST_ASSIGN3").item(0).getTextContent().equals("")){
+											((JCheckBox) tabCompStaff[i]).setSelected(true);
+										}
+											
+									}
+									break;
+								case "S4":
+									if(eElement.getElementsByTagName("ST_ASSIGN4").item(0) != null){
+										if(!eElement.getElementsByTagName("ST_ASSIGN4").item(0).getTextContent().equals("")){
+											((JCheckBox) tabCompStaff[i]).setSelected(true);
+										}
+											
+									}
+									break;
+								case "S5":
+									if(eElement.getElementsByTagName("ST_ASSIGN5").item(0) != null){
+										if(!eElement.getElementsByTagName("ST_ASSIGN5").item(0).getTextContent().equals("")){
+											((JCheckBox) tabCompStaff[i]).setSelected(true);
+										}
+											
+									}
+									break;
+								case "S6":
+									if(eElement.getElementsByTagName("ST_ASSIGN6").item(0) != null){
+										if(!eElement.getElementsByTagName("ST_ASSIGN6").item(0).getTextContent().equals("")){
+											((JCheckBox) tabCompStaff[i]).setSelected(true);
+										}
+											
+									}
+									break;
+								case "S7":
+									if(eElement.getElementsByTagName("ST_ASSIGN7").item(0) != null){
+										if(!eElement.getElementsByTagName("ST_ASSIGN7").item(0).getTextContent().equals("")){
+											((JCheckBox) tabCompStaff[i]).setSelected(true);
+										}
+											
+									}
+									break;
+								case "S8":
+									if(eElement.getElementsByTagName("ST_ASSIGN8").item(0) != null){
+										if(!eElement.getElementsByTagName("ST_ASSIGN8").item(0).getTextContent().equals("")){
+											((JCheckBox) tabCompStaff[i]).setSelected(true);
+										}
+											
+									}
+									break;
+								}
+							}
+						}
 						
 						/*
 						 * Stephen:
