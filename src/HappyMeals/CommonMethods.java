@@ -168,16 +168,13 @@ public class CommonMethods {
 																																		// ArrayList
 																																		// Object]
 
-	static ArrayList<String> arrEvents = new ArrayList<String>();// stores the
-																	// Event
-																	// Names as
-																	// populated
-	// from XML
-	static ArrayList<String> arrEventDates = new ArrayList<String>();// stores
-																		// the
-																		// Event
-																		// Dates
-																		// as
+	static ArrayList<String> arrEvents;// stores the Event Names as populated
+										// from XML
+	static ArrayList<String> arrEventDates;// stores
+											// the
+											// Event
+											// Dates
+											// as
 	// populated from XML
 
 	// Arrays used for storing menu information
@@ -630,6 +627,14 @@ public class CommonMethods {
 		txtDate.setColumns(60);
 		txtDate.setName("DATE");
 		pnlEvent.add(txtDate);
+
+		/*
+		 * JButton btnCal = new JButton(); btnCal.setText("Calendar");
+		 * btnCal.setBounds(380, 28, 20, 20); btnCal.addActionListener(new
+		 * ActionListener() { public void actionPerformed(ActionEvent ae) {
+		 * dateCalendar objDate = new dateCalendar();
+		 * objDate.frame.setVisible(true); } }); pnlEvent.add(btnCal);
+		 */
 
 		// TIME
 		JLabel lblTime = new JLabel("Time (XX:XX _M)");
@@ -1766,14 +1771,23 @@ public class CommonMethods {
 
 			disp += "All Event Details must be filled\n";
 
-		// date not working
-		if (!txtDate.getText().trim().equals("")
-				&& !Pattern
-						.compile(
-								"(0?[1-9]|1[012])/(0?[1-9]|[12][0-9]|3[01])/(20\\d\\d)")
-						.matcher(txtDate.getText().trim()).matches())
-			disp += "Incorrect format for Date\n";
-		
+		if (!txtEventName.getText().trim().equals("")) { // validate same names
+															// of events
+			if (arrEvents.contains(txtEventName.getText().trim()))
+				disp += "Another event already exists with the same name\n";
+		}
+
+		if (!txtDate.getText().trim().equals("")) {
+			if (!Pattern
+					.compile(
+							"(0?[1-9]|1[012])/(0?[1-9]|[12][0-9]|3[01])/(20\\d\\d)")
+					.matcher(txtDate.getText().trim()).matches()) {
+				disp += "Incorrect format for Date\n";
+			} else {
+				if (arrEventDates.contains(txtDate.getText().trim()))
+					disp += "There is already an event scheduled for the selected date\n"; //Validate same dates
+			}
+		}
 
 		if (!txtTime.getText().trim().equals("")
 				&& !Pattern
@@ -1890,7 +1904,8 @@ public class CommonMethods {
 
 			transformer.transform(source, result);
 
-			System.out.println("File updated!");
+			System.out.println("New event appended to file!");
+			getEvents();
 		} catch (ParserConfigurationException pce) {
 			pce.printStackTrace();
 		} catch (IOException ioe) {
@@ -2020,7 +2035,8 @@ public class CommonMethods {
 
 			transformer.transform(source, result);
 
-			System.out.println("File saved!");
+			System.out.println("New file created with an event");
+			getEvents();
 
 		} catch (ParserConfigurationException pce) {
 			pce.printStackTrace();
@@ -2035,7 +2051,8 @@ public class CommonMethods {
 	public void getEvents() {
 		try {
 			File xmlFile = new File("file.xml");
-
+			arrEvents = new ArrayList<String>();
+			arrEventDates = new ArrayList<String>();
 			if (xmlFile.exists()) {
 				DocumentBuilderFactory dbFactory = DocumentBuilderFactory
 						.newInstance();
@@ -2186,7 +2203,8 @@ public class CommonMethods {
 			StreamResult result = new StreamResult(xmlFile);
 			transformer.transform(source, result);
 
-			System.out.println("Done");
+			System.out.println("Event Details Updated");
+			getEvents();
 
 		} catch (ParserConfigurationException pce) {
 			pce.printStackTrace();

@@ -8,12 +8,15 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+
+import com.toedter.calendar.JCalendar;
 
 public class ViewEvents {
 
@@ -67,6 +70,12 @@ public class ViewEvents {
 			pnlAdd.add(event);
 		}
 
+		JCalendar eventCalendar = new JCalendar();
+		eventCalendar.setBounds(250, 120, 200, 200);
+		pnlAdd.add(eventCalendar);
+		
+		int i = eventCalendar.getCalendar().get(Calendar.DAY_OF_MONTH);
+		
 		// Home Button
 		JButton btnMainPage = new JButton("HOME");
 		btnMainPage.addActionListener(new ActionListener() {
