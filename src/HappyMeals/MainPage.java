@@ -1,15 +1,17 @@
 /*
  * @author: Piyush Agarwal
+ * @author: Neha Singh (Scheduled Events display)
  */
 
 package HappyMeals;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,7 +22,8 @@ public class MainPage {
 
 	public JFrame frame;
 	private static MainPage windowMain = new MainPage();
-	public static CommonMethods objCommon;
+	public CommonMethods objCommon;
+
 	/**
 	 * Launch the application.
 	 */
@@ -28,8 +31,7 @@ public class MainPage {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {					
-					windowMain.frame.setVisible(true);				
-					
+					windowMain.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -37,14 +39,16 @@ public class MainPage {
 		});
 	}
 
+	
 	/**
 	 * Create the application.
-	 * @wbp.parser.entryPoint
+	 * 
 	 */
 	public MainPage() {
 		initialize();
 	}
 
+	
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -58,69 +62,76 @@ public class MainPage {
 		//create a new panel
 		JPanel pnlMain = new JPanel();
 		pnlMain.setLayout(null);
-		
-		//create a new label for Heading and add it to the panel
-		JLabel lblEvents = new JLabel("Event Management");
-		lblEvents.setBounds(30, 70, 185, 40);
-		lblEvents.setHorizontalAlignment(SwingConstants.CENTER);
-		lblEvents.setFont(new Font("Tahoma", Font.BOLD, 18));
-		pnlMain.add(lblEvents);
-		
-		//create a new button for Add Events and add it to the panel
+
+		// create a new button for Add Events and add it to the panel
 		JButton btnAdd = new JButton("Add Event");
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				objCommon = new CommonMethods();
-				//objCommon.createXML();
 				AddEvent windowAdd = new AddEvent(objCommon);
 				windowAdd.frame.setVisible(true);
 				windowMain.frame.setVisible(false);
 			}
 		});
 		btnAdd.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		btnAdd.setBounds(40, 115, 160, 30);
+		btnAdd.setBounds(20, 80, 120, 30);
 		pnlMain.add(btnAdd);
-		
-		//create a new button for Update Events and add it to the panel
+
+		// create a new button for Update Events and add it to the panel
 		JButton btnUpdate = new JButton("Update Event");
 		btnUpdate.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {					
+			public void actionPerformed(ActionEvent ae) {
 				UpdateEvent windowUpdate = new UpdateEvent();
 				windowUpdate.frame.setVisible(true);
-				windowMain.frame.setVisible(false);							
-			}
-		});
-		btnUpdate.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		btnUpdate.setBounds(40, 156, 160, 30);
-		File xmlFile = new File("file.xml");
-		if(!xmlFile.exists())
-			btnUpdate.setEnabled(false);		
-		else
-			btnUpdate.setEnabled(true);
-		pnlMain.add(btnUpdate);
-		
-		//create a new button for View Events and add it to the panel
-		JButton btnView = new JButton("View Events");
-		btnView.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		btnView.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				ViewEvents eventsView = new ViewEvents();
-				eventsView.frame.setVisible(true);
 				windowMain.frame.setVisible(false);
 			}
 		});
+		btnUpdate.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		btnUpdate.setBounds(160, 80, 150, 30);
+		objCommon = new CommonMethods();
+		objCommon.getEvents();
+		if (CommonMethods.arrEvents.isEmpty())
+			btnUpdate.setEnabled(false);
+		else
+			btnUpdate.setEnabled(true);
+		pnlMain.add(btnUpdate);
+
+
+		//Create and populate label for displaying scheduled events
+		JLabel lblView = new JLabel();
+		lblView.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lblView.setBounds(10,130,470,130);
+		lblView.setBorder(BorderFactory.createEtchedBorder());
+		pnlMain.add(lblView);
 		
-		btnView.setBounds(40, 197, 160, 30);
-		pnlMain.add(btnView);
+		JLabel lblViewHead = new JLabel();
+		lblViewHead.setText("Scheduled Events");
+		lblViewHead.setFont(new Font("Tahoma", Font.BOLD, 16));
+		lblViewHead.setBounds(150, 0, 150, 30);
+		lblView.add(lblViewHead);
 		
-		//create a new label for Heading and add it to the panel
-		JLabel lblMenu = new JLabel("Menu");
-		lblMenu.setBounds(296, 70, 98, 40);
-		lblMenu.setHorizontalAlignment(SwingConstants.CENTER);
-		lblMenu.setFont(new Font("Tahoma", Font.BOLD, 18));
-		pnlMain.add(lblMenu);
+		String event = "<html><body>";
+		objCommon.getEvents(); // get Events from the XML file
+		if (!CommonMethods.arrEvents.isEmpty()) {
+			for (int i = 0; i < CommonMethods.arrEvents.size(); i++) {
+				event += CommonMethods.arrEvents.get(i) + "&nbsp;|&nbsp;" + CommonMethods.arrEventDates.get(i) +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+				if(i == 2 || i == 5 || i == 8) {//if there are three events in a row, go to the next row
+					event+= "<br>";
+				}
+			}
+			event += "</body></html>";
+		} else {
+			event = "No Scheduled Events as of now. Look for some new Cients...";
+		}
+
+		JLabel lblEvent = new JLabel();
+		lblEvent.setText(event.trim());
+		lblEvent.setForeground(Color.BLUE);
+		lblEvent.setBounds(10, 5, 450, 120);
+		lblView.add(lblEvent);
 		
-		//create a new button for View Menu and add it to the panel
+		
+		// create a new button for Viewing Menu and add it to the panel
 		JButton btnViewMenu = new JButton("View Menu");
 		btnViewMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -130,18 +141,18 @@ public class MainPage {
 			}
 		});
 		btnViewMenu.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		btnViewMenu.setBounds(269, 115, 160, 30);
+		btnViewMenu.setBounds(330, 80, 130, 30);
 		pnlMain.add(btnViewMenu);
-		
-		
+
+		//create label for Header
 		JLabel lblHeading = new JLabel("Happy Meals");
 		lblHeading.setHorizontalAlignment(SwingConstants.CENTER);
 		lblHeading.setFont(new Font("Tahoma", Font.BOLD, 22));
 		lblHeading.setBounds(130, 11, 205, 40);
 		pnlMain.add(lblHeading);
+
 		
-		
-		//add the panel to the frame and make the frame visible
-		frame.getContentPane().add(pnlMain);		
+		// add the panel to the frame and make the frame visible
+		frame.getContentPane().add(pnlMain);
 	}
 }

@@ -49,9 +49,7 @@ public class ViewMenu {
 		lblAddHead.setFont(new Font("Tahoma", Font.BOLD, 22));
 		lblAddHead.setBounds(146, 12, 174, 27);
 		pnlAdd.add(lblAddHead);
-		
-		
-		
+	
 				
 		//Home Button
 		JButton btnMainPage = new JButton("HOME");
