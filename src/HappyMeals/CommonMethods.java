@@ -1921,9 +1921,12 @@ public class CommonMethods {
 				|| txtDate.getText().trim().equals("")
 				|| txtTime.getText().trim().equals("")
 				|| txtAttend.getText().trim().equals(""))
-
+		{
 			disp += "All Event Details must be filled\n";
 
+		}
+		
+		
 		if (!txtEventName.getText().trim().equals("")) { // validate same names
 															// of events
 			if (arrEvents.contains(txtEventName.getText().trim()))

@@ -51,7 +51,7 @@ public class UpdateEvent {
 	public JFrame frame; // JFrame object
 	private CommonMethods objCommon;
 
-	JComboBox<Object> cmbSelEvent;
+	public JComboBox<Object> cmbSelEvent;
 	JTabbedPane tabPan;
 
 	/**
@@ -152,6 +152,91 @@ public class UpdateEvent {
 		lblSelEvent.setBounds(10, 30, 184, 27);
 		pnlUpdate.add(lblSelEvent);
 
+		final JButton btnUpdate = new JButton("UPDATE");
+		btnUpdate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				boolean makeUpdate = objCommon.Update(cmbSelEvent
+						.getSelectedItem().toString());
+				if (makeUpdate) {
+					JOptionPane.showMessageDialog(null, "All Changes made to this event Saved!",
+							"UPDATE", JOptionPane.INFORMATION_MESSAGE);
+					
+					cmbSelEvent.setSelectedIndex(0);
+				}
+			}
+		});
+		btnUpdate.setBounds(226, 333, 124, 27);
+		btnUpdate.setEnabled(false);
+		pnlUpdate.add(btnUpdate);
+		
+		
+		// create button for cancelling an event and removing it from file
+				final JButton btnCancelEvent = new JButton("CANCEL EVENT");
+				btnCancelEvent.setForeground(Color.RED);
+				btnCancelEvent.setBounds(10, 335, 136, 23);
+				btnCancelEvent.setEnabled(false);
+				btnCancelEvent.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						int reply = JOptionPane
+								.showConfirmDialog(
+										null,
+										"Are you sure you want to CANCEL/DELETE the selected event from the system?\n Note: If YES, you will redirected back to the Main Page",
+										"Confirm?", JOptionPane.YES_NO_OPTION);
+						if (reply == JOptionPane.YES_OPTION) {
+							try {
+								File xmlFile = new File("file.xml");
+								DocumentBuilderFactory docFactory = DocumentBuilderFactory
+										.newInstance();
+								DocumentBuilder docBuilder = docFactory
+										.newDocumentBuilder();
+								Document doc = docBuilder.parse(xmlFile);
+
+								NodeList nList = doc.getElementsByTagName("EVENT");
+								for (int temp = 0; temp < nList.getLength(); temp++) {
+
+									Node nNode = nList.item(temp);
+
+									if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+										Element eElement = (Element) nNode;
+										if (eElement.getAttribute("NAME").equals(
+												cmbSelEvent.getSelectedItem())) {
+											eElement.getParentNode().removeChild(
+													eElement);
+
+										}
+									}
+
+									// update the XML file
+									TransformerFactory transformerFactory = TransformerFactory
+											.newInstance();
+									Transformer transformer = transformerFactory
+											.newTransformer();
+									DOMSource source = new DOMSource(doc);
+									StreamResult result = new StreamResult(xmlFile);
+									transformer.transform(source, result);
+								}
+							} catch (ParserConfigurationException pce) {
+								pce.printStackTrace();
+							} catch (TransformerException tfe) {
+								tfe.printStackTrace();
+							} catch (IOException ioe) {
+								ioe.printStackTrace();
+							} catch (SAXException sae) {
+								sae.printStackTrace();
+							}
+						}
+
+						frame.setVisible(false);
+						MainPage objMain = new MainPage();
+						objMain.frame.setVisible(true);
+					}
+
+				});
+				pnlUpdate.add(btnCancelEvent);
+				
+		
 		// Combo-box for selecting event
 		Collections.sort(CommonMethods.arrEvents);
 		cmbSelEvent = new JComboBox<Object>(CommonMethods.arrEvents.toArray());
@@ -166,15 +251,19 @@ public class UpdateEvent {
 					tabPan.setVisible(true);
 					populateTabs();
 					updateVariables();
+					btnUpdate.setEnabled(true);
+					btnCancelEvent.setEnabled(true);
 				} else {
 					tabPan.setVisible(false);
+					btnUpdate.setEnabled(false);
+					btnCancelEvent.setEnabled(false);
 				}
 			}
 		});
 		pnlUpdate.add(cmbSelEvent);
 
 		// Cancel button
-		JButton btnCancel = new JButton("CANCEL");
+		JButton btnCancel = new JButton("HOME");
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				objCommon.goHome(frame); // call the function from common to go
@@ -184,86 +273,11 @@ public class UpdateEvent {
 		btnCancel.setBounds(354, 333, 124, 27);
 		pnlUpdate.add(btnCancel);
 
-		JButton btnUpdate = new JButton("UPDATE");
-		btnUpdate.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-
-				boolean makeUpdate = objCommon.Update(cmbSelEvent
-						.getSelectedItem().toString());
-				if (makeUpdate) {
-					JOptionPane.showMessageDialog(null, "All Changes Saved!",
-							"UPDATE", JOptionPane.INFORMATION_MESSAGE);
-				}
-			}
-		});
-		btnUpdate.setBounds(226, 333, 124, 27);
-		pnlUpdate.add(btnUpdate);
+		
 
 		frame.getContentPane().add(pnlUpdate); // add panel to the frame
 
-		// create button for cancelling an event and removing it from file
-		JButton btnCancelEvent = new JButton("CANCEL EVENT");
-		btnCancelEvent.setForeground(Color.RED);
-		btnCancelEvent.setBounds(10, 335, 136, 23);
-		btnCancelEvent.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int reply = JOptionPane
-						.showConfirmDialog(
-								null,
-								"Are you sure you want to CANCEL/DELETE the selected event from the system?\n Note: If YES, you will redirected back to the Main Page",
-								"Confirm?", JOptionPane.YES_NO_OPTION);
-				if (reply == JOptionPane.YES_OPTION) {
-					try {
-						File xmlFile = new File("file.xml");
-						DocumentBuilderFactory docFactory = DocumentBuilderFactory
-								.newInstance();
-						DocumentBuilder docBuilder = docFactory
-								.newDocumentBuilder();
-						Document doc = docBuilder.parse(xmlFile);
-
-						NodeList nList = doc.getElementsByTagName("EVENT");
-						for (int temp = 0; temp < nList.getLength(); temp++) {
-
-							Node nNode = nList.item(temp);
-
-							if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-
-								Element eElement = (Element) nNode;
-								if (eElement.getAttribute("NAME").equals(
-										cmbSelEvent.getSelectedItem())) {
-									eElement.getParentNode().removeChild(
-											eElement);
-
-								}
-							}
-
-							// update the XML file
-							TransformerFactory transformerFactory = TransformerFactory
-									.newInstance();
-							Transformer transformer = transformerFactory
-									.newTransformer();
-							DOMSource source = new DOMSource(doc);
-							StreamResult result = new StreamResult(xmlFile);
-							transformer.transform(source, result);
-						}
-					} catch (ParserConfigurationException pce) {
-						pce.printStackTrace();
-					} catch (TransformerException tfe) {
-						tfe.printStackTrace();
-					} catch (IOException ioe) {
-						ioe.printStackTrace();
-					} catch (SAXException sae) {
-						sae.printStackTrace();
-					}
-				}
-
-				frame.setVisible(false);
-				MainPage objMain = new MainPage();
-				objMain.frame.setVisible(true);
-			}
-
-		});
-		pnlUpdate.add(btnCancelEvent);
+		
 	}
 
 	// Updates the variable for orders
