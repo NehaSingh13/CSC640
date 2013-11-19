@@ -14,9 +14,12 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 import javax.swing.ButtonGroup;
@@ -63,10 +66,10 @@ public class CommonMethods {
 
 	// txt fields for client info
 	JTextField txtFN, txtLN, txtStreet, txtZip, txtCity, txtPhone, txtEmail;
-	
+
 	// txt fields for event info
 	JTextField txtOther, txtDate, txtTime, txtAttend, txtEventName;
-	
+
 	// txt fields for drink info
 	JTextField txtDrink0 = new JTextField("0");
 	JTextField txtDrink1 = new JTextField("0");
@@ -77,7 +80,7 @@ public class CommonMethods {
 	JTextField txtDrink6 = new JTextField("0");
 	JTextField txtDrink7 = new JTextField("0");
 	JTextField txtDrink8 = new JTextField("0");
-	
+
 	// txt fields for snack info
 	JTextField txtSnack0 = new JTextField("0");
 	JTextField txtSnack1 = new JTextField("0");
@@ -88,7 +91,7 @@ public class CommonMethods {
 	JTextField txtSnack6 = new JTextField("0");
 	JTextField txtSnack7 = new JTextField("0");
 	JTextField txtSnack8 = new JTextField("0");
-	
+
 	// txt fields for entree info
 	JTextField txtEntree0 = new JTextField("0");
 	JTextField txtEntree1 = new JTextField("0");
@@ -99,7 +102,7 @@ public class CommonMethods {
 	JTextField txtEntree6 = new JTextField("0");
 	JTextField txtEntree7 = new JTextField("0");
 	JTextField txtEntree8 = new JTextField("0");
-	
+
 	// txt fields for dessert info
 	JTextField txtDessert0 = new JTextField("0");
 	JTextField txtDessert1 = new JTextField("0");
@@ -116,7 +119,8 @@ public class CommonMethods {
 
 	JTextArea txtNotes;
 	JRadioButton rdbtnOurBanquet, rdbtnOther;
-	JCheckBox chkStaff1, chkStaff2, chkStaff3, chkStaff4, chkStaff5, chkStaff6,chkStaff7, chkStaff8;
+	JCheckBox chkStaff1, chkStaff2, chkStaff3, chkStaff4, chkStaff5, chkStaff6,
+			chkStaff7, chkStaff8;
 	ButtonGroup rdbtnGroupVenue;
 	JComboBox<Object> cmbStates;
 	JTabbedPane tabpnlAdd;
@@ -142,8 +146,8 @@ public class CommonMethods {
 	JLabel sSubtotal;
 	JLabel eSubtotal;
 	JLabel deSubtotal;
-	
-	static JTextArea tA; //text area for Chef
+
+	static JTextArea tA; // text area for Chef
 
 	static ArrayList<String> arrEvents;// stores the Event Names as populated
 										// from XML
@@ -152,7 +156,6 @@ public class CommonMethods {
 											// Event
 											// Dates
 											// as populated from XML
-	
 
 	// Arrays used for storing menu information
 	// headers for columns
@@ -399,6 +402,7 @@ public class CommonMethods {
 
 	/**
 	 * Creates tab panel for add event
+	 * 
 	 * @return tab panel for Add Event
 	 */
 	public JTabbedPane getTabs() {
@@ -411,9 +415,9 @@ public class CommonMethods {
 		return tabpnlAdd;
 	}
 
-	
 	/**
 	 * Creates tab panel for Update Event
+	 * 
 	 * @return tab panel for Update event
 	 */
 	public JTabbedPane getTabsUpdate() {
@@ -428,8 +432,6 @@ public class CommonMethods {
 		return tabpnlAdd;
 	}
 
-	
-	
 	// tabs for the display of the Menu
 	public JTabbedPane getTabsMenu() {
 		tabpnlAdd = new JTabbedPane(JTabbedPane.TOP);
@@ -452,7 +454,6 @@ public class CommonMethods {
 		return tabpnlAdd2;
 	}
 
-	
 	public void goHome(JFrame frame) {
 		int reply = JOptionPane
 				.showConfirmDialog(
@@ -466,7 +467,6 @@ public class CommonMethods {
 		}
 	}
 
-	
 	// calls home page without giving warning
 	public void goHome2(JFrame frame) {
 		frame.setVisible(false);
@@ -474,9 +474,9 @@ public class CommonMethods {
 		objMain.frame.setVisible(true);
 	}
 
-	
 	/**
 	 * Makes the client panel and initializes the components on it
+	 * 
 	 * @return Client Panel
 	 */
 	private Component makePnlClient() {
@@ -566,7 +566,7 @@ public class CommonMethods {
 		arrStates.add("Maine");
 		arrStates.add("Maryland");
 		arrStates.add("Massachusetts");
-		arrStates.add("Michegan");
+		arrStates.add("Michigan");
 		arrStates.add("Minnesota");
 		arrStates.add("Mississippi");
 		arrStates.add("Missouri");
@@ -659,6 +659,7 @@ public class CommonMethods {
 
 	/**
 	 * Makes the Event Panel and initializes its components
+	 * 
 	 * @return Event Panel
 	 */
 	private Component makePnlEvent() {
@@ -784,7 +785,6 @@ public class CommonMethods {
 		return pnlEvent;
 	}
 
-	
 	private Component makePnlOrder() {
 		// create a panel object and set its layout to null(absolute)
 		JPanel pnlOrder = new JPanel();
@@ -793,7 +793,6 @@ public class CommonMethods {
 		return pnlOrder;
 	}
 
-	
 	private Component makePnlInvoice() {
 
 		// create a panel object and set its layout to null(absolute)
@@ -1035,7 +1034,7 @@ public class CommonMethods {
 				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		entreePane
 				.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-	
+
 		entreePane.setBounds(1, 3, 490, 235);
 		pnlEntrees.add(entreePane);
 
@@ -1061,7 +1060,7 @@ public class CommonMethods {
 				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		dessertPane
 				.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-	
+
 		dessertPane.setBounds(1, 3, 490, 235);
 		pnlDesserts.add(dessertPane);
 
@@ -1342,7 +1341,6 @@ public class CommonMethods {
 		return pnlSnacksOrder;
 	}// end makePnlSnacksOrder
 
-	
 	// Entree Order
 	private Component makePnlEntreesOrder() {
 		// create a panel object and set its layout to null(absolute)
@@ -1473,7 +1471,6 @@ public class CommonMethods {
 		return pnlEntreesOrder;
 	}// end makePnlEntreesOrder method
 
-	
 	// Dessert Order
 	private Component makePnlDessertsOrder() {
 		// create a panel object and set its layout to null(absolute)
@@ -1609,7 +1606,6 @@ public class CommonMethods {
 		return pnlDessertsOrder;
 	}
 
-	
 	private Component makeChefInstructions() {
 		// create a panel object and set its layout to null(absolute)
 		final JPanel pnlChefInstructions = new JPanel();
@@ -1623,7 +1619,8 @@ public class CommonMethods {
 
 		tA = new JTextArea("");
 		tA.setBounds(20, 30, 420, 170);
-		tA.setEnabled(false);	//so that no one can make any changes to the text box
+		tA.setEnabled(false); // so that no one can make any changes to the text
+								// box
 		pnlChefInstructions.add(tA);
 
 		// add scroll pane
@@ -1641,7 +1638,8 @@ public class CommonMethods {
 						.showMessageDialog(
 								null,
 								"A Copy of the Chef Instructions for this event has been saved to a file...\n\n",
-								"CREATE COPY FOR CHEF", JOptionPane.INFORMATION_MESSAGE);
+								"CREATE COPY FOR CHEF",
+								JOptionPane.INFORMATION_MESSAGE);
 
 				writeToFile(tA.getText());
 
@@ -1649,12 +1647,11 @@ public class CommonMethods {
 		});
 		btnNext.setBounds(300, 212, 180, 23);
 		pnlChefInstructions.add(btnNext);
-		
+
 		return pnlChefInstructions;
 
 	}// end makeChefInstructions
 
-	
 	private Component makeAssignStaff() {
 		// create a panel object and set its layout to null(absolute)
 		final JPanel pnlAssignStaff = new JPanel();
@@ -1714,7 +1711,6 @@ public class CommonMethods {
 		return pnlAssignStaff;
 	}
 
-
 	public boolean Add() {
 		boolean val = validation();
 
@@ -1723,7 +1719,6 @@ public class CommonMethods {
 		}
 		return val;
 	}
-	
 
 	/**
 	 * Validates the values provided by the user for the Orders tab
@@ -1881,7 +1876,6 @@ public class CommonMethods {
 		}
 	}
 
-	
 	/**
 	 * validates the values provided by the user for the Client and Event Tabs
 	 * 
@@ -1920,13 +1914,11 @@ public class CommonMethods {
 		if (txtEventName.getText().trim().equals("")
 				|| txtDate.getText().trim().equals("")
 				|| txtTime.getText().trim().equals("")
-				|| txtAttend.getText().trim().equals(""))
-		{
+				|| txtAttend.getText().trim().equals("")) {
 			disp += "All Event Details must be filled\n";
 
 		}
-		
-		
+
 		if (!txtEventName.getText().trim().equals("")) { // validate same names
 															// of events
 			if (arrEvents.contains(txtEventName.getText().trim()))
@@ -1940,10 +1932,67 @@ public class CommonMethods {
 					.matcher(txtDate.getText().trim()).matches()) {
 				disp += "Incorrect format for Date\n";
 			} else {
-				if (arrEventDates.contains(txtDate.getText().trim()))
-					disp += "There is already an event scheduled for the selected date\n"; // Validate
-																							// same
-																							// dates
+				String[] dateSplit = txtDate.getText().trim().split("/");
+				boolean goodDate = true;
+
+				// Validate date according to month and year
+				if ((dateSplit[0].equals("1") || dateSplit[0].equals("3")
+						|| dateSplit[0].equals("5") || dateSplit[0].equals("7")
+						|| dateSplit[0].equals("8")
+						|| dateSplit[0].equals("01")
+						|| dateSplit[0].equals("03")
+						|| dateSplit[0].equals("05")
+						|| dateSplit[0].equals("07")
+						|| dateSplit[0].equals("08")
+						|| dateSplit[0].equals("10") || dateSplit[0]
+							.equals("12"))
+						&& Integer.parseInt(dateSplit[1]) > 31) {
+					disp += "Incorrect Date";
+					goodDate = false;
+				} else if ((dateSplit[0].equals("4")
+						|| dateSplit[0].equals("6") || dateSplit[0].equals("9")
+						|| dateSplit[0].equals("04")
+						|| dateSplit[0].equals("06")
+						|| dateSplit[0].equals("09") || dateSplit[0]
+							.equals("11"))
+						&& Integer.parseInt(dateSplit[1]) > 30) {
+					disp += "Incorrect Date";
+					goodDate = false;
+				} else if (dateSplit[0].equals("2")
+						|| dateSplit[0].equals("02")) {
+					if (Integer.parseInt(dateSplit[2]) % 4 == 0
+							&& (Integer.parseInt(dateSplit[1]) > 29))
+						disp += "Incorrect Date";
+					else if (Integer.parseInt(dateSplit[2]) % 4 != 0
+							&& (Integer.parseInt(dateSplit[1]) > 28))
+						disp += "Incorrect Date";
+
+					goodDate = false;
+				}
+
+				// check if selected date is before today's date
+				if (goodDate) {
+					try {
+						DateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+						Date date1 = sdf.parse(txtDate.getText().trim());
+						// Date date1 =
+						// sdf.parse(String.valueOf(Integer.parseInt(dateSplit[0])
+						// - 1) + "/" + dateSplit[1] + "/" + dateSplit[2]);
+						Date date2 = new Date();
+						if (date1.compareTo(date2) < 0) {
+							disp += "Date cannot be a previous date";
+							goodDate = false;
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+
+				// Check if an event already exists for the selected date in the
+				// system
+				if (goodDate
+						&& arrEventDates.contains(txtDate.getText().trim()))
+					disp += "There is already an event scheduled for the selected date\n";
 			}
 		}
 
@@ -1966,13 +2015,13 @@ public class CommonMethods {
 		}
 	}
 
-	
 	/**
 	 * Called on Update Click to update the values
+	 * 
 	 * @param selEvent
 	 * @return
 	 */
-	
+
 	public boolean Update(String selEvent) {
 
 		boolean val = validation();
@@ -1984,9 +2033,9 @@ public class CommonMethods {
 
 	}
 
-	
 	/**
-	 * Called on Add click, based on file exists or not the appropriate function is called
+	 * Called on Add click, based on file exists or not the appropriate function
+	 * is called
 	 */
 	private void Save() {
 		File dataFile = new File("file.xml");
@@ -1996,7 +2045,6 @@ public class CommonMethods {
 			appendXML();
 	}
 
-	
 	/**
 	 * appends a new event to the file
 	 */
@@ -2020,7 +2068,7 @@ public class CommonMethods {
 
 			transformer.transform(source, result);
 
-			getEvents(); //update the event and event dates lists
+			getEvents(); // update the event and event dates lists
 		} catch (ParserConfigurationException pce) {
 			pce.printStackTrace();
 		} catch (IOException ioe) {
@@ -2032,7 +2080,6 @@ public class CommonMethods {
 		}
 	}// end appendXML method
 
-	
 	/**
 	 * Creates the XML Schema for a new event
 	 * 
@@ -2431,7 +2478,6 @@ public class CommonMethods {
 		return doc;
 	}// end addNewEvent method
 
-	
 	/**
 	 * Creates a new XML document if it does not exists
 	 */
@@ -2456,7 +2502,7 @@ public class CommonMethods {
 
 			transformer.transform(source, result);
 
-			getEvents(); //update the event and event dates list
+			getEvents(); // update the event and event dates list
 
 		} catch (ParserConfigurationException pce) {
 			pce.printStackTrace();
@@ -2465,7 +2511,6 @@ public class CommonMethods {
 		}
 	}
 
-	
 	/**
 	 * Gets the scheduled Event Names and their respective Dates from the file
 	 */
@@ -2498,10 +2543,9 @@ public class CommonMethods {
 
 	}
 
-	
-	
 	public void writeToFile(String text) {
-		// create/updates a text file on chef instruction create copy... button for a particular event
+		// create/updates a text file on chef instruction create copy... button
+		// for a particular event
 		try {
 			String filename = "chef_" + txtEventName.getText().trim() + ".txt";
 			File f1 = new File(filename);
@@ -2519,7 +2563,6 @@ public class CommonMethods {
 		}
 	}
 
-	
 	/**
 	 * Updates the file by saving changes made by the user for the selected
 	 * event
@@ -2997,7 +3040,7 @@ public class CommonMethods {
 			StreamResult result = new StreamResult(xmlFile);
 			transformer.transform(source, result);
 
-			getEvents(); //update the event names and dates list
+			getEvents(); // update the event names and dates list
 
 		} catch (ParserConfigurationException pce) {
 			pce.printStackTrace();
